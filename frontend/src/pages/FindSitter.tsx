@@ -1,5 +1,6 @@
 import { plantSitters } from "../data/plantSitters";
 import { users } from "../data/users";
+import SitterCard from "../components/SitterCard";
 
 function FindSitter() {
   return (
@@ -10,18 +11,11 @@ function FindSitter() {
         const user = users.find((user) => user.id === sitter.userId);
 
         return (
-          <div key={sitter.id}>
-            <div>{user?.name}</div>
-            <div>{sitter.city}</div>
-            <div>
-              {sitter.experience}
-              {sitter.experience === 1
-                ? " year of experience"
-                : " years of experience"}
-            </div>
-            <div>{sitter.pricePerDay}€</div>
-            <div>{sitter.available ? "Available" : "Not Available"}</div>
-          </div>
+          <SitterCard
+            key={sitter.id}
+            name={user?.name ?? "Unknown user"}
+            sitter={sitter}
+          />
         );
       })}
     </>

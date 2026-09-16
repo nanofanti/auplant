@@ -1,4 +1,23 @@
 import { Link } from "react-router-dom";
+import HowItWorksCard from "../components/HowItWorksCard";
+
+const howItWorks = [
+  {
+    listNumber: 1,
+    title: "FIND",
+    subTitle: "Find a plant sitter near you!",
+  },
+  {
+    listNumber: 2,
+    title: "CONNECT",
+    subTitle: "Choose someone who fits your needs",
+  },
+  {
+    listNumber: 3,
+    title: "RELAX",
+    subTitle: "Enjoy your trip knowing your plants are cared for",
+  },
+];
 
 function Home() {
   return (
@@ -19,18 +38,14 @@ function Home() {
       <section>
         <h2 className="text-3xl">How It Works</h2>
         <div>
-          <div>
-            <h3>1. FIND</h3>
-            <p>Find a plant sitter near you</p>
-          </div>
-          <div>
-            <h3>2. CONNECT</h3>
-            <p>Choose someone who fits your needs</p>
-          </div>
-          <div>
-            <h3>3. RELAX</h3>
-            <p>Enjoy your trip knowing your plants are cared for</p>
-          </div>
+          {howItWorks.map((homeCard) => (
+            <HowItWorksCard
+              key={homeCard.listNumber}
+              listNumber={homeCard.listNumber}
+              title={homeCard.title}
+              subTitle={homeCard.subTitle}
+            />
+          ))}
         </div>
       </section>
       <section>
