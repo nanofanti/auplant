@@ -1,15 +1,9 @@
 import type { Request, Response } from "express";
+import User from "../models/User.js";
 
-const fakeUsers = [
-  { id: 1, name: "Marco" },
-  { id: 2, name: "Annie" },
-  { id: 3, name: "Stefania" },
-];
-
-export const getUserById = (req: Request, res: Response) => {
-  const user = fakeUsers.find(
-    (fakeUser) => fakeUser.id === Number(req.params.id),
-  );
+export const getUserById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
   if (user) {
     res.json(user);
   } else {
@@ -17,6 +11,11 @@ export const getUserById = (req: Request, res: Response) => {
   }
 };
 
-export const getUsers = (req: Request, res: Response) => {
-  res.json(fakeUsers);
+export const getUsers = async (req: Request, res: Response) => {
+  const users = await User.find();
+  res.json(users);
+};
+
+export const createUser = async (req: Request, res: Response) => {
+  const { name, email, password, roles } = req.body;
 };
