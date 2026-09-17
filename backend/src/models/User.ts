@@ -7,6 +7,7 @@ interface IUser {
   email: string;
   password: string;
   roles: UserRole[];
+  profileImage?: string;
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -29,6 +30,9 @@ const userSchema = new mongoose.Schema<IUser>(
       type: [String],
       enum: ["owner", "sitter"],
       required: true,
+    },
+    profileImage: {
+      type: String,
     },
   },
   {
