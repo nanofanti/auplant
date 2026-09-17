@@ -4,7 +4,7 @@ import User from "../models/User.js";
 
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = await User.findById(id);
+  const user = await User.findById(id).select("-password");
   if (user) {
     res.json(user);
   } else {
@@ -13,7 +13,7 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const getUsers = async (req: Request, res: Response) => {
-  const users = await User.find();
+  const users = await User.find().select("-password");
   res.json(users);
 };
 

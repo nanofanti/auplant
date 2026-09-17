@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import type { AuthRequest } from "../middleware/authMiddleware.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
@@ -38,8 +39,20 @@ export const login = async (req: Request, res: Response) => {
   });
 };
 
-export const getMe = async (req: Request, res: Response) => {
+export const getMe = async (req: AuthRequest, res: Response) => {
+  const user = await User.findById(req.userId);
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  const userObject = user.toObject();
+  const { password: _, ...safeUser } = userObject;
+
   return res.status(200).json({
     message: "You are authenticated",
+    data: safeUser,
   });
 };
