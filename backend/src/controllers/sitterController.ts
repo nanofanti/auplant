@@ -1,4 +1,4 @@
-import type { Response } from "express";
+import type { Response, Request } from "express";
 import mongoose from "mongoose";
 
 import type { AuthRequest } from "../middleware/authMiddleware.js";
@@ -60,5 +60,15 @@ export const createSitterProfile = async (req: AuthRequest, res: Response) => {
   return res.status(201).json({
     message: "Sitter profile created successfully",
     data: sitterProfile,
+  });
+};
+
+export const getSitterProfiles = async (req: Request, res: Response) => {
+  const sitterProfiles = await SitterProfile.find().populate(
+    "userId",
+    "name profileImage",
+  );
+  return res.status(200).json({
+    data: sitterProfiles,
   });
 };
