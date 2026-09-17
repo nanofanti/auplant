@@ -33,6 +33,8 @@ export const login = async (req: Request, res: Response) => {
 
   const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: "1h" });
 
+  res.cookie("token", token, { httpOnly: true });
+
   return res.status(200).json({
     message: "Login successful",
     token,
@@ -54,5 +56,13 @@ export const getMe = async (req: AuthRequest, res: Response) => {
   return res.status(200).json({
     message: "You are authenticated",
     data: safeUser,
+  });
+};
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie("token");
+
+  return res.status(200).json({
+    message: "Logout successful",
   });
 };

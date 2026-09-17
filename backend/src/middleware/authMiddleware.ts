@@ -10,17 +10,9 @@ export const protect = (
   res: Response,
   next: NextFunction,
 ) => {
-  const authHeader = req.headers.authorization;
+  const token = req.cookies.token;
 
-  if (!authHeader) {
-    return res.status(401).json({
-      message: "Not authorized",
-    });
-  }
-
-  const [scheme, token] = authHeader.split(" ");
-
-  if (scheme !== "Bearer" || !token) {
+  if (!token) {
     return res.status(401).json({
       message: "Not authorized",
     });
