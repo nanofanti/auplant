@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
+import type { AuthRequest } from "../middleware/authMiddleware.js";
 
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -43,4 +44,27 @@ export const createUser = async (req: Request, res: Response) => {
   const { password: _, ...safeUser } = userObject;
 
   res.status(201).json({ message: "User created", data: safeUser });
+};
+
+export const deleteUser = async (req: AuthRequest, res: Response) => {
+  if (req.params.id !== req.userId) {
+    return res.status(403).json({
+      message: "You are not authorized to delete this account",
+    });
+  }
+
+  const { id } = req.params;
+  const deletedUser = await User.findByIdAndDelete(id);
+
+  if (!deletedUser) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  res.clearCookie("token");
+
+  return res.status(200).json({
+    message: "User deleted successfully",
+  });
 };
