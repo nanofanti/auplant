@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
 export interface AuthRequest extends Request {
   userId?: string;
@@ -45,4 +46,26 @@ export const protect = (
       message: "Not authorized",
     });
   }
+};
+
+export const adminOnly = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  const user = await User.findById(req.userId);
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  if (!user.isAdmin) {
+    return res.status(403).json({
+      message: "Admin access required",
+    });
+  }
+
+  return next();
 };
