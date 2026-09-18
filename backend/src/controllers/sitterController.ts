@@ -72,3 +72,112 @@ export const getSitterProfiles = async (req: Request, res: Response) => {
     data: sitterProfiles,
   });
 };
+
+export const getSitterProfileById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (typeof id !== "string") {
+    return res.status(400).json({ message: "Invalid sitter profile ID" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid sitter profile ID" });
+  }
+
+  const sitterProfile = await SitterProfile.findById(id).populate(
+    "userId",
+    "name profileImage",
+  );
+  if (!sitterProfile) {
+    return res.status(404).json({ message: "404: Sitter profile not found" });
+  }
+
+  return res.status(200).json({
+    data: sitterProfile,
+  });
+};
+
+export const updateSitterProfile = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+
+  if (typeof id !== "string") {
+    return res.status(400).json({ message: "Invalid sitter profile ID" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid sitter profile ID" });
+  }
+
+  const sitterProfile = await SitterProfile.findById(id);
+
+  if (!sitterProfile) {
+    return res.status(404).json({ message: "Sitter profile not found" });
+  }
+
+  if (sitterProfile.userId.toString() !== req.userId) {
+    return res.status(403).json({
+      message: "You are not authorized to update this sitter profile",
+    });
+  }
+
+  const { location, bio, experience, pricePerDay, availability, services } =
+    req.body;
+
+  if (location !== undefined) {
+    sitterProfile.location = location;
+  }
+
+  if (bio !== undefined) {
+    sitterProfile.bio = bio;
+  }
+
+  if (experience !== undefined) {
+    sitterProfile.experience = experience;
+  }
+  if (pricePerDay !== undefined) {
+    sitterProfile.pricePerDay = pricePerDay;
+  }
+  if (availability !== undefined) {
+    sitterProfile.availability = availability;
+  }
+  if (services !== undefined) {
+    sitterProfile.services = services;
+  }
+
+  await sitterProfile.save();
+
+  return res.status(200).json({
+    message: "Sitter profile updated successfully",
+    data: sitterProfile,
+  });
+};
+
+export const deleteSitterProfile = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+
+  if (typeof id !== "string") {
+    return res.status(400).json({ message: "Invalid sitter profile ID" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid sitter profile ID" });
+  }
+
+  const sitterProfile = await SitterProfile.findById(id);
+
+  if (!sitterProfile) {
+    return res.status(404).json({ message: "Sitter profile not found" });
+  }
+
+  if (sitterProfile.userId.toString() !== req.userId) {
+    return res.status(403).json({
+      message: "You are not authorized to delete this sitter profile",
+    });
+  }
+
+  await sitterProfile.deleteOne();
+
+  return res.status(200).json({
+    message: "Sitter profile deleted successfully",
+  });
+};
