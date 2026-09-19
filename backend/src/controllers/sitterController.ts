@@ -89,7 +89,7 @@ export const getSitterProfileById = async (req: Request, res: Response) => {
     "name profileImage",
   );
   if (!sitterProfile) {
-    return res.status(404).json({ message: "404: Sitter profile not found" });
+    return res.status(404).json({ message: "Sitter profile not found" });
   }
 
   return res.status(200).json({
