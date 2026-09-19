@@ -28,11 +28,11 @@ export async function createSitter(
     body: JSON.stringify(sitterData),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to create sitter profile");
-  }
-
   const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to create sitter profile");
+  }
 
   return data;
 }
