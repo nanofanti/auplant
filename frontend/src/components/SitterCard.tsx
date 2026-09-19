@@ -7,9 +7,9 @@ type SitterCardProps = {
 
 function SitterCard({ name, sitter }: SitterCardProps) {
   return (
-    <div>
-      <h2>{name}</h2>
-      <div>{sitter.location}</div>
+    <div className="my-4 mx-4 p-4 bg-green-700">
+      <h2 className="text-2xl">{name}</h2>
+      <div className="text-xl">{sitter.location}</div>
       <div>{sitter.bio}</div>
       <div>{sitter.experience}</div>
       <div>{sitter.pricePerDay}€</div>
