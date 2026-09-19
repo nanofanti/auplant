@@ -15,3 +15,7 @@ export type GetMeResponse = {
   message: string;
   data: AuthUser;
 };
+
+export type LogoutResponse = {
+  message: string;
+};

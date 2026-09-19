@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function NavBar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <nav>
@@ -11,6 +11,13 @@ function NavBar() {
           <Link to="/">Homepage</Link>
         </li>
         <li>{user && <p>Hello {user.name}</p>}</li>
+        <li>
+          {user && (
+            <button className="bg-red-400" onClick={logout}>
+              Logout
+            </button>
+          )}
+        </li>
         <li>
           <Link to="/find-sitter">Find a Sitter</Link>
         </li>

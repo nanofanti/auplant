@@ -1,4 +1,8 @@
-import type { LoginResponse, GetMeResponse } from "../types/Auth";
+import type {
+  LoginResponse,
+  GetMeResponse,
+  LogoutResponse,
+} from "../types/Auth";
 
 export async function login(
   email: string,
@@ -32,6 +36,21 @@ export async function getMe(): Promise<GetMeResponse> {
 
   if (!response.ok) {
     throw new Error("You are not authorized");
+  }
+
+  const data = await response.json();
+
+  return data;
+}
+
+export async function logout(): Promise<LogoutResponse> {
+  const response = await fetch("http://localhost:8080/api/auth/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Logout failed");
   }
 
   const data = await response.json();
