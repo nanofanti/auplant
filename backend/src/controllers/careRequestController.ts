@@ -170,3 +170,33 @@ export const updateCareRequest = async (req: AuthRequest, res: Response) => {
     data: careRequest,
   });
 };
+
+export const deleteCareRequest = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+
+  if (typeof id !== "string") {
+    return res.status(400).json({ message: "Invalid care request ID" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid care request ID" });
+  }
+
+  const careRequest = await CareRequest.findById(id);
+
+  if (!careRequest) {
+    return res.status(404).json({ message: "Care request not found" });
+  }
+
+  if (careRequest.ownerId.toString() !== req.userId) {
+    return res.status(403).json({
+      message: "You are not authorized to delete this care request",
+    });
+  }
+
+  await careRequest.deleteOne();
+
+  return res.status(200).json({
+    message: "Care request deleted successfully",
+  });
+};
