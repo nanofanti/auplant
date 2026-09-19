@@ -18,3 +18,28 @@ export type PlantSitter = {
 export type SitterResponse = {
   data: PlantSitter[];
 };
+
+export type CreateSitterData = {
+  location: string;
+  bio: string;
+  experience: string;
+  pricePerDay: number;
+  availability: boolean;
+  services: string[];
+};
+
+export type CreatedSitterProfile = {
+  _id: string;
+  userId: string;
+  location: string;
+  bio: string;
+  experience: string;
+  pricePerDay: number;
+  availability: boolean;
+  services: string[];
+};
+
+export type CreateSitterResponse = {
+  message: string;
+  data: CreatedSitterProfile;
+};
