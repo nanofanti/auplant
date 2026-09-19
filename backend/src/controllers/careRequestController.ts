@@ -95,3 +95,78 @@ export const getCareRequestById = async (req: Request, res: Response) => {
     data: careRequest,
   });
 };
+
+export const updateCareRequest = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+
+  if (typeof id !== "string") {
+    return res.status(400).json({
+      message: "Invalid care request ID",
+    });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      message: "Invalid care request ID",
+    });
+  }
+
+  const careRequest = await CareRequest.findById(id);
+
+  if (!careRequest) {
+    return res.status(404).json({
+      message: "Care request not found",
+    });
+  }
+
+  if (careRequest.ownerId.toString() !== req.userId) {
+    return res.status(403).json({
+      message: "You are not authorized to update this care request",
+    });
+  }
+
+  const {
+    location,
+    startDate,
+    endDate,
+    numberOfPlants,
+    description,
+    photos,
+    offeredPrice,
+    status,
+  } = req.body;
+
+  if (location !== undefined) {
+    careRequest.location = location;
+  }
+
+  if (startDate !== undefined) {
+    careRequest.startDate = startDate;
+  }
+
+  if (endDate !== undefined) {
+    careRequest.endDate = endDate;
+  }
+  if (numberOfPlants !== undefined) {
+    careRequest.numberOfPlants = numberOfPlants;
+  }
+  if (description !== undefined) {
+    careRequest.description = description;
+  }
+  if (photos !== undefined) {
+    careRequest.photos = photos;
+  }
+  if (offeredPrice !== undefined) {
+    careRequest.offeredPrice = offeredPrice;
+  }
+  if (status !== undefined) {
+    careRequest.status = status;
+  }
+
+  await careRequest.save();
+
+  return res.status(200).json({
+    message: "Care request updated successfully",
+    data: careRequest,
+  });
+};
