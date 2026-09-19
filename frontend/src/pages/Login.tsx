@@ -1,15 +1,22 @@
 import { useState } from "react";
-import { login } from "../services/authService";
+import { login, getMe } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const { setUser } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const response = await login(email, password);
     console.log(response);
+
+    const meResponse = await getMe();
+    console.log(meResponse);
+
+    setUser(meResponse.data);
   };
 
   return (

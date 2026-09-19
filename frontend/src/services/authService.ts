@@ -1,4 +1,4 @@
-import type { LoginResponse } from "../types/Auth";
+import type { LoginResponse, GetMeResponse } from "../types/Auth";
 
 export async function login(
   email: string,
@@ -18,6 +18,20 @@ export async function login(
 
   if (!response.ok) {
     throw new Error("Login failed");
+  }
+
+  const data = await response.json();
+
+  return data;
+}
+
+export async function getMe(): Promise<GetMeResponse> {
+  const response = await fetch("http://localhost:8080/api/auth/me", {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("You are not authorized");
   }
 
   const data = await response.json();
