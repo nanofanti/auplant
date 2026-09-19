@@ -1,8 +1,20 @@
+export type SitterUser = {
+  _id: string;
+  name: string;
+  profileImage?: string;
+};
+
 export type PlantSitter = {
-  id: number;
-  userId: number;
-  city: string;
-  experience: number;
+  _id: string;
+  userId: SitterUser;
+  location: string;
+  bio: string;
+  experience: string;
   pricePerDay: number;
-  available: boolean;
+  availability: boolean;
+  services: string[];
+};
+
+export type SitterResponse = {
+  data: PlantSitter[];
 };

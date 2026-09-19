@@ -9,15 +9,12 @@ function SitterCard({ name, sitter }: SitterCardProps) {
   return (
     <div>
       <h2>{name}</h2>
-      <div>{sitter.city}</div>
-      <div>
-        {sitter.experience}
-        {sitter.experience === 1
-          ? " year of experience"
-          : " years of experience"}
-      </div>
+      <div>{sitter.location}</div>
+      <div>{sitter.bio}</div>
+      <div>{sitter.experience}</div>
       <div>{sitter.pricePerDay}€</div>
-      <div>{sitter.available ? "Available" : "Not Available"}</div>
+      <div>{sitter.availability ? "Available" : "Not Available"}</div>
+      <div>{sitter.services}</div>
     </div>
   );
 }
