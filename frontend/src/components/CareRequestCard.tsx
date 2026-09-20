@@ -14,7 +14,7 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
           className={
             careRequest.status === "open"
               ? "rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
-              : "rounded-full bg-gray-100 px-3 py-1 text-sm text-green-700"
+              : "rounded-full bg-red-300 px-3 py-1 text-sm"
           }
         >
           {careRequest.status}
