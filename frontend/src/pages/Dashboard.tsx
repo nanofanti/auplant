@@ -1,16 +1,19 @@
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import {
+  deleteCareRequest,
   getMyCareRequests,
   updateCareRequestStatus,
 } from "../services/careRequestService";
 import type { CareRequest, CareRequestStatus } from "../types/CareRequest";
 import CareRequestCard from "../components/CareRequestCard";
 import { toast } from "sonner";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Dashboard() {
   const { user } = useAuth();
   const [myCareRequests, setMyCareRequests] = useState<CareRequest[]>([]);
+  const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     const loadMyCareRequests = async () => {
@@ -52,6 +55,37 @@ function Dashboard() {
         toast.error("Failed to update care request");
       }
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteCareRequest(id);
+
+      setMyCareRequests((currentRequests) =>
+        currentRequests.filter((careRequest) => careRequest._id !== id),
+      );
+
+      toast.success("Care request successfully deleted");
+
+      return true;
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to delete care request");
+      }
+
+      return false;
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!requestToDelete) {
+      return;
+    }
+
+    await handleDelete(requestToDelete);
+    setRequestToDelete(null);
   };
 
   return (
@@ -99,11 +133,26 @@ function Dashboard() {
                     ? "Close Request"
                     : "Reopen Request"}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setRequestToDelete(careRequest._id)}
+                  className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                >
+                  Delete
+                </button>
               </div>
             ))}
           </div>
         )}
       </section>
+      {requestToDelete && (
+        <ConfirmModal
+          title="Delete care request?"
+          message="This action cannot be undone."
+          onCancel={() => setRequestToDelete(null)}
+          onConfirm={confirmDelete}
+        />
+      )}
     </main>
   );
 }
