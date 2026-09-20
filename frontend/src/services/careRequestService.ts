@@ -1,4 +1,5 @@
 import type {
+  CareRequestsResponse,
   CreateCareRequestData,
   CreateCareRequestResponse,
 } from "../types/CareRequest";
@@ -20,6 +21,18 @@ export async function createCareRequest(
   if (!response.ok) {
     throw new Error(data.message || "Failed to create care request");
   }
+
+  return data;
+}
+
+export async function getCareRequests(): Promise<CareRequestsResponse> {
+  const response = await fetch("http://localhost:8080/api/care-requests");
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch care requests");
+  }
+
+  const data = await response.json();
 
   return data;
 }

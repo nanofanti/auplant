@@ -30,12 +30,16 @@ function Home() {
           Connect with plant lovers near you and find the right person to look
           after your plants while you're away.
         </p>
-        <div>
-          <Link to="/find-sitter">Find a Sitter</Link>
-          <Link to="/become-sitter">Become a Sitter</Link>
+        <div className="p-4">
+          <Link className="p-4 m-4 bg-green-700" to="/find-sitter">
+            Find a Sitter
+          </Link>
+          <Link className="p-4 m-4 bg-green-700" to="/become-sitter">
+            Become a Sitter
+          </Link>
         </div>
       </section>
-      <section>
+      <section className="p-4">
         <h2 className="text-3xl">How It Works</h2>
         <div>
           {howItWorks.map((homeCard) => (
@@ -54,8 +58,14 @@ function Home() {
           Whether you're looking for someone to care for your plants or you'd
           like to help other plant owners, AuPlant connects you.
         </p>
-        <Link to="/find-sitter">Find a Sitter</Link>
-        <Link to="/become-sitter">Become a Sitter</Link>
+        <div className="p-4">
+          <Link className="p-4 m-4 bg-green-700" to="/find-sitter">
+            Find a Sitter
+          </Link>
+          <Link className="p-4 m-4 bg-green-700" to="/become-sitter">
+            Become a Sitter
+          </Link>
+        </div>
       </section>
     </>
   );
