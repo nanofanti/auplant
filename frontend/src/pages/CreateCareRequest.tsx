@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { CreateCareRequestData } from "../types/CareRequest";
 import { createCareRequest } from "../services/careRequestService";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 function CreateCareRequest() {
   const [location, setLocation] = useState<string>("");
@@ -10,16 +12,10 @@ function CreateCareRequest() {
   const [description, setDescription] = useState<string>("");
   const [photos, setPhotos] = useState<string>("");
   const [offeredPrice, setOfferedPrice] = useState<number>(0);
-
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    event.preventDefault();
-
-    setSuccessMessage(null);
-    setErrorMessage(null);
 
     const careRequestData: CreateCareRequestData = {
       location,
@@ -27,13 +23,16 @@ function CreateCareRequest() {
       endDate,
       numberOfPlants,
       description,
-      photos: photos.split(",").map((photo) => photo.trim()),
+      photos: photos
+        .split(",")
+        .map((photo) => photo.trim())
+        .filter((photo) => photo !== ""),
       offeredPrice,
     };
 
     try {
-      const response = await createCareRequest(careRequestData);
-      setSuccessMessage(response.message);
+      await createCareRequest(careRequestData);
+      toast.success("Care request created successfully");
       setLocation("");
       setStartDate("");
       setEndDate("");
@@ -41,12 +40,12 @@ function CreateCareRequest() {
       setDescription("");
       setPhotos("");
       setOfferedPrice(0);
-      console.log(response);
+      navigate("/care-requests");
     } catch (error) {
       if (error instanceof Error) {
-        setErrorMessage(error.message);
+        toast.error(error.message);
       } else {
-        setErrorMessage("Failed to create care request");
+        toast.error("Failed to create care request");
       }
     }
   };
@@ -60,29 +59,34 @@ function CreateCareRequest() {
           placeholder="Location"
           value={location}
           onChange={(event) => setLocation(event.target.value)}
+          required
         />
         <input
           type="date"
           placeholder="Start date"
           value={startDate}
           onChange={(event) => setStartDate(event.target.value)}
+          required
         />
         <input
           type="date"
           placeholder="End date"
           value={endDate}
           onChange={(event) => setEndDate(event.target.value)}
+          required
         />
         <input
           type="number"
           placeholder="Number of plants"
           value={numberOfPlants}
           onChange={(event) => setNumberOfPlants(Number(event.target.value))}
+          required
         />
         <textarea
           placeholder="Describe your plants and care instructions"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
+          required
         />
         <input
           type="text"
@@ -95,11 +99,10 @@ function CreateCareRequest() {
           placeholder="Price offered"
           value={offeredPrice}
           onChange={(event) => setOfferedPrice(Number(event.target.value))}
+          required
         />
         <button type="submit">Create Care Request</button>
       </form>
-      {successMessage && <p>{successMessage}</p>}
-      {errorMessage && <p>{errorMessage}</p>}
     </>
   );
 }

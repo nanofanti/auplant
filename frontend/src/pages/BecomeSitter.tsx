@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { CreateSitterData } from "../types/PlantSitter";
 import { createSitter } from "../services/sitterService";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 function BecomeSitter() {
   const [location, setLocation] = useState<string>("");
@@ -10,14 +11,10 @@ function BecomeSitter() {
   const [pricePerDay, setPricePerDay] = useState<number>(0);
   const [availability, setAvailability] = useState<boolean>(true);
   const [services, setServices] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setErrorMessage(null);
-    setSuccessMessage(null);
 
     const sitterData: CreateSitterData = {
       location,
@@ -29,31 +26,31 @@ function BecomeSitter() {
     };
 
     try {
-      const response = await createSitter(sitterData);
-      setSuccessMessage(response.message);
+      await createSitter(sitterData);
+      toast.success("Sitter profile created successfully");
+
       setLocation("");
       setBio("");
       setExperience("");
       setPricePerDay(0);
       setAvailability(true);
       setServices("");
-      console.log(response);
 
       setTimeout(() => {
         navigate("/find-sitter");
       }, 1500);
     } catch (error) {
       if (error instanceof Error) {
-        setErrorMessage(error.message);
+        toast.error(error.message);
       } else {
-        setErrorMessage("Failed to create a sitter profile");
+        toast.error("Failed to create a sitter profile");
       }
     }
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form className="flex items-center gap-6" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Location"
@@ -94,8 +91,6 @@ function BecomeSitter() {
         />
         <button type="submit">Create Sitter Profile</button>
       </form>
-      {successMessage && <p>{successMessage}</p>}
-      {errorMessage && <p>{errorMessage}</p>}
     </>
   );
 }

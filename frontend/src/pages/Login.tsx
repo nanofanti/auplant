@@ -1,22 +1,32 @@
 import { useState } from "react";
 import { login, getMe } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const { setUser } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const response = await login(email, password);
-    console.log(response);
+    try {
+      const response = await login(email, password);
+      console.log(response);
+      const meResponse = await getMe();
+      console.log(meResponse);
 
-    const meResponse = await getMe();
-    console.log(meResponse);
-
-    setUser(meResponse.data);
+      setUser(meResponse.data);
+      toast.success("Login successful");
+      navigate(from, { replace: true });
+    } catch {
+      toast.error("Email or password is incorrect");
+    }
   };
 
   return (

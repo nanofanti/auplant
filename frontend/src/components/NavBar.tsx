@@ -5,28 +5,65 @@ function NavBar() {
   const { user, logout } = useAuth();
 
   return (
-    <nav>
-      <ul>
-        <li>
-          <Link to="/">Homepage</Link>
+    <nav className="border-b border-gray-200 bg-white px-6 py-4">
+      <ul className="flex items-center gap-6">
+        <li className="mr-auto">
+          <Link to="/" className="text-xl font-bold text-green-700">
+            AuPlant 🌱
+          </Link>
         </li>
-        <li>{user && <p>Hello {user.name}</p>}</li>
+
+        {user?.roles.includes("owner") && (
+          <li>
+            <Link
+              to="/create-care-request"
+              className="rounded-lg bg-green-700 px-4 py-2 text-white hover:bg-green-800"
+            >
+              Create Care Request
+            </Link>
+          </li>
+        )}
         <li className="py-4">
-          {user && (
-            <button className="p-4 m-4 bg-red-400" onClick={logout}>
-              Logout
-            </button>
-          )}
-        </li>
-        <li className="py-4">
-          <Link className="p-4 m-4 bg-green-700" to="/find-sitter">
+          <Link className="font-medium hover:text-green-700" to="/find-sitter">
             Find a Sitter
           </Link>
         </li>
         <li className="py-4">
-          <Link className="p-4 m-4 bg-green-700" to="/become-sitter">
+          <Link
+            className="font-medium hover:text-green-700"
+            to="/become-sitter"
+          >
             Become a Sitter
           </Link>
+        </li>
+        <li>
+          <Link
+            className="font-medium hover:text-green-700"
+            to="/care-requests"
+          >
+            Care Requests
+          </Link>
+        </li>
+        <li>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm">Hello {user.name}</span>
+
+              <button
+                className="cursor-pointer rounded-lg border border-gray-300 bg-red-500 px-3 py-2 hover:bg-gray-100"
+                onClick={logout}
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="rounded-lg bg-green-700 px-4 py-2 text-white hover:bg-green-800"
+            >
+              Login
+            </Link>
+          )}
         </li>
       </ul>
     </nav>
