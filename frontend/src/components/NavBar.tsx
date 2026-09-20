@@ -47,7 +47,9 @@ function NavBar() {
         <li>
           {user ? (
             <div className="flex items-center gap-3">
-              <span className="text-sm">Hello {user.name}</span>
+              <Link to="/dashboard">
+                <span className="text-sm">Hello {user.name}</span>
+              </Link>
 
               <button
                 className="cursor-pointer rounded-lg border border-gray-300 bg-red-500 px-3 py-2 hover:bg-gray-100"

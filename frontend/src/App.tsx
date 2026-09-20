@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import CreateCareRequest from "./pages/CreateCareRequest";
 import CareRequests from "./pages/CareRequests";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./pages/Dashboard";
 import { Toaster } from "sonner";
 
 import "./App.css";
@@ -19,6 +20,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/find-sitter" element={<FindSitter />} />
           <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/become-sitter" element={<BecomeSitter />} />
             <Route
               path="/create-care-request"

@@ -200,3 +200,16 @@ export const deleteCareRequest = async (req: AuthRequest, res: Response) => {
     message: "Care request deleted successfully",
   });
 };
+
+export const getMyCareRequests = async (req: AuthRequest, res: Response) => {
+  if (!req.userId) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+  const myCareRequests = await CareRequest.find({
+    ownerId: req.userId,
+  }).populate("ownerId", "name profileImage");
+
+  return res.status(200).json({
+    data: myCareRequests,
+  });
+};

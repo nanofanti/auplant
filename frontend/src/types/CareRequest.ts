@@ -1,3 +1,5 @@
+export type CareRequestStatus = "open" | "closed";
+
 export type CreateCareRequestData = {
   location: string;
   startDate: string;
@@ -18,7 +20,7 @@ export type CreatedCareRequest = {
   description: string;
   photos: string[];
   offeredPrice: number;
-  status: "open" | "closed";
+  status: CareRequestStatus;
 };
 
 export type CreateCareRequestResponse = {
@@ -42,7 +44,7 @@ export type CareRequest = {
   description: string;
   photos: string[];
   offeredPrice: number;
-  status: "open" | "closed";
+  status: CareRequestStatus;
 };
 
 export type CareRequestsResponse = {

@@ -6,6 +6,7 @@ import {
   getCareRequestById,
   updateCareRequest,
   deleteCareRequest,
+  getMyCareRequests,
 } from "../controllers/careRequestController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -15,6 +16,8 @@ const router = Router();
 router.post("/", protect, createCareRequest);
 
 router.get("/", getCareRequests);
+
+router.get("/me", protect, getMyCareRequests);
 
 router.get("/:id", getCareRequestById);
 
