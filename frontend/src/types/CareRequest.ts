@@ -50,3 +50,9 @@ export type CareRequest = {
 export type CareRequestsResponse = {
   data: CareRequest[];
 };
+
+export type UpdateCareRequestData = Partial<CreateCareRequestData>;
+
+export type CareRequestResponse = {
+  data: CareRequest;
+};

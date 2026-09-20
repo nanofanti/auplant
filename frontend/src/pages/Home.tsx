@@ -21,7 +21,7 @@ const howItWorks = [
 
 function Home() {
   return (
-    <>
+    <main className="mx-auto max-w-6xl px-6 py-10">
       <section>
         <h1 className="text-5xl font-bold text-green-700">
           Find someone who cares for your plants as much as you do.
@@ -30,7 +30,7 @@ function Home() {
           Connect with plant lovers near you and find the right person to look
           after your plants while you're away.
         </p>
-        <div className="p-4">
+        <div className="p-4 flex">
           <Link className="p-4 m-4 bg-green-700" to="/find-sitter">
             Find a Sitter
           </Link>
@@ -58,7 +58,7 @@ function Home() {
           Whether you're looking for someone to care for your plants or you'd
           like to help other plant owners, AuPlant connects you.
         </p>
-        <div className="p-4">
+        <div className="flex p-4">
           <Link className="p-4 m-4 bg-green-700" to="/find-sitter">
             Find a Sitter
           </Link>
@@ -67,7 +67,7 @@ function Home() {
           </Link>
         </div>
       </section>
-    </>
+    </main>
   );
 }
 

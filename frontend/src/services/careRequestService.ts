@@ -1,8 +1,10 @@
 import type {
   CareRequestsResponse,
+  CareRequestResponse,
   CreateCareRequestData,
   CreateCareRequestResponse,
   CareRequestStatus,
+  UpdateCareRequestData,
 } from "../types/CareRequest";
 
 export async function createCareRequest(
@@ -89,6 +91,45 @@ export async function deleteCareRequest(id: string) {
 
   if (!response.ok) {
     throw new Error(data.message || "Failed to delete care request");
+  }
+
+  return data;
+}
+
+export async function updateCareRequest(
+  id: string,
+  updates: UpdateCareRequestData,
+) {
+  const response = await fetch(
+    `http://localhost:8080/api/care-requests/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(updates),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update care request");
+  }
+
+  return data;
+}
+
+export async function getCareRequestById(
+  id: string,
+): Promise<CareRequestResponse> {
+  const response = await fetch(`http://localhost:8080/api/care-requests/${id}`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch care request");
   }
 
   return data;

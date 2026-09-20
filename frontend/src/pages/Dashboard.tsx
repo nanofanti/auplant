@@ -9,6 +9,7 @@ import type { CareRequest, CareRequestStatus } from "../types/CareRequest";
 import CareRequestCard from "../components/CareRequestCard";
 import { toast } from "sonner";
 import ConfirmModal from "../components/ConfirmModal";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
   const { user } = useAuth();
@@ -84,8 +85,11 @@ function Dashboard() {
       return;
     }
 
-    await handleDelete(requestToDelete);
-    setRequestToDelete(null);
+    const deleted = await handleDelete(requestToDelete);
+
+    if (deleted) {
+      setRequestToDelete(null);
+    }
   };
 
   return (
@@ -133,6 +137,12 @@ function Dashboard() {
                     ? "Close Request"
                     : "Reopen Request"}
                 </button>
+                <Link
+                  to={`/care-requests/${careRequest._id}/edit`}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                >
+                  Edit
+                </Link>
                 <button
                   type="button"
                   onClick={() => setRequestToDelete(careRequest._id)}
