@@ -15,6 +15,7 @@ type AuthContextType = {
   loading: boolean;
   logout: () => Promise<void>;
   refreshSitterProfile: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -50,6 +51,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error) {
       console.error("Failed to load sitter profile:", error);
       setSitterProfile(null);
+    }
+  };
+
+  const refreshUser = async () => {
+    try {
+      const response = await getMe();
+
+      setUser(response.data);
+    } catch (error) {
+      console.error("Failed to refresh user:", error);
+      setUser(null);
     }
   };
 
@@ -90,6 +102,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         loading,
         logout,
         refreshSitterProfile,
+        refreshUser,
       }}
     >
       {children}

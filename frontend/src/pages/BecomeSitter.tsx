@@ -3,6 +3,16 @@ import type { CreateSitterData } from "../types/PlantSitter";
 import { createSitter } from "../services/sitterService";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useAuth } from "../context/AuthContext";
+
+const availableServices = [
+  { value: "watering", label: "Watering" },
+  { value: "plant check-ins", label: "Plant check-ins" },
+  { value: "repotting", label: "Repotting" },
+  { value: "fertilizing", label: "Fertilizing" },
+  { value: "pruning", label: "Pruning" },
+  { value: "pest inspection", label: "Pest inspection" },
+];
 
 function BecomeSitter() {
   const [location, setLocation] = useState<string>("");
@@ -10,8 +20,9 @@ function BecomeSitter() {
   const [experience, setExperience] = useState<string>("");
   const [pricePerDay, setPricePerDay] = useState<number>(0);
   const [availability, setAvailability] = useState<boolean>(true);
-  const [services, setServices] = useState<string>("");
+  const [services, setServices] = useState<string[]>([]);
   const navigate = useNavigate();
+  const { refreshSitterProfile, refreshUser } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -22,11 +33,15 @@ function BecomeSitter() {
       experience,
       pricePerDay,
       availability,
-      services: services.split(",").map((service) => service.trim()),
+      services,
     };
 
     try {
       await createSitter(sitterData);
+
+      await refreshUser();
+      await refreshSitterProfile();
+
       toast.success("Sitter profile created successfully");
 
       setLocation("");
@@ -34,7 +49,7 @@ function BecomeSitter() {
       setExperience("");
       setPricePerDay(0);
       setAvailability(true);
-      setServices("");
+      setServices([]);
 
       setTimeout(() => {
         navigate("/find-sitter");
@@ -46,6 +61,14 @@ function BecomeSitter() {
         toast.error("Failed to create a sitter profile");
       }
     }
+  };
+
+  const handleServiceChange = (service: string) => {
+    setServices((currentServices) =>
+      currentServices.includes(service)
+        ? currentServices.filter((currentService) => currentService !== service)
+        : [...currentServices, service],
+    );
   };
 
   return (
@@ -83,12 +106,27 @@ function BecomeSitter() {
             }}
           />
         </label>
-        <input
-          type="text"
-          placeholder="Services (separated by commas)"
-          value={services}
-          onChange={(event) => setServices(event.target.value)}
-        />
+        <fieldset>
+          <legend className="mb-3 font-medium text-gray-700">Services</legend>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {availableServices.map((service) => (
+              <label
+                key={service.value}
+                className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 p-3 hover:bg-gray-50"
+              >
+                <input
+                  type="checkbox"
+                  checked={services.includes(service.value)}
+                  onChange={() => handleServiceChange(service.value)}
+                  className="h-4 w-4 accent-green-700"
+                />
+
+                <span>{service.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
         <button type="submit">Create Sitter Profile</button>
       </form>
     </>

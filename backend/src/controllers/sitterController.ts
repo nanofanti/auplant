@@ -28,13 +28,6 @@ export const createSitterProfile = async (req: AuthRequest, res: Response) => {
     });
   }
 
-  // Only users with the "sitter" role can create a sitter profile
-  if (!user.roles.includes("sitter")) {
-    return res.status(403).json({
-      message: "Only sitters can create a sitter profile",
-    });
-  }
-
   // A user can only have one sitter profile
   const existingProfile = await SitterProfile.findOne({
     userId,
@@ -55,6 +48,10 @@ export const createSitterProfile = async (req: AuthRequest, res: Response) => {
     pricePerDay,
     availability,
     services,
+  });
+
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { roles: "sitter" },
   });
 
   return res.status(201).json({
@@ -156,17 +153,23 @@ export const deleteSitterProfile = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
 
   if (typeof id !== "string") {
-    return res.status(400).json({ message: "Invalid sitter profile ID" });
+    return res.status(400).json({
+      message: "Invalid sitter profile ID",
+    });
   }
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "Invalid sitter profile ID" });
+    return res.status(400).json({
+      message: "Invalid sitter profile ID",
+    });
   }
 
   const sitterProfile = await SitterProfile.findById(id);
 
   if (!sitterProfile) {
-    return res.status(404).json({ message: "Sitter profile not found" });
+    return res.status(404).json({
+      message: "Sitter profile not found",
+    });
   }
 
   if (sitterProfile.userId.toString() !== req.userId) {
@@ -176,6 +179,10 @@ export const deleteSitterProfile = async (req: AuthRequest, res: Response) => {
   }
 
   await sitterProfile.deleteOne();
+
+  await User.findByIdAndUpdate(req.userId, {
+    $pull: { roles: "sitter" },
+  });
 
   return res.status(200).json({
     message: "Sitter profile deleted successfully",

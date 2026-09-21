@@ -78,3 +78,18 @@ export async function updateSitterProfile(
 
   return data;
 }
+
+export async function deleteSitterProfile(id: string) {
+  const response = await fetch(`http://localhost:8080/api/sitters/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to delete sitter profile");
+  }
+
+  return data;
+}

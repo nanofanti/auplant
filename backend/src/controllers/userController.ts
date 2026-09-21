@@ -20,7 +20,7 @@ export const getUsers = async (req: Request, res: Response) => {
 };
 
 export const createUser = async (req: Request, res: Response) => {
-  const { name, email, password, roles } = req.body;
+  const { name, email, password } = req.body;
 
   const existingUser = await User.findOne({
     email,
@@ -38,7 +38,7 @@ export const createUser = async (req: Request, res: Response) => {
     name,
     email,
     password: hashedPassword,
-    roles,
+    roles: ["owner"],
   });
 
   const userObject = user.toObject();
