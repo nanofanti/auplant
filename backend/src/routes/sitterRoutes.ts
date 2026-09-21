@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   createSitterProfile,
   deleteSitterProfile,
+  getMySitterProfile,
   getSitterProfileById,
   getSitterProfiles,
   updateSitterProfile,
@@ -14,6 +15,8 @@ const router = Router();
 router.post("/", protect, createSitterProfile);
 
 router.get("/", getSitterProfiles);
+
+router.get("/me", protect, getMySitterProfile);
 
 router.get("/:id", getSitterProfileById);
 

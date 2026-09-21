@@ -181,3 +181,22 @@ export const deleteSitterProfile = async (req: AuthRequest, res: Response) => {
     message: "Sitter profile deleted successfully",
   });
 };
+
+export const getMySitterProfile = async (req: AuthRequest, res: Response) => {
+  if (!req.userId) {
+    return res.status(401).json({ message: "Not authorized" });
+  }
+  const mySitterProfile = await SitterProfile.findOne({
+    userId: req.userId,
+  }).populate("userId", "name profileImage");
+
+  if (!mySitterProfile) {
+    return res.status(404).json({
+      message: "Sitter profile not found",
+    });
+  }
+
+  return res.status(200).json({
+    data: mySitterProfile,
+  });
+};

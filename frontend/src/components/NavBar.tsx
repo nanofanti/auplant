@@ -9,7 +9,7 @@ function NavBar() {
       <ul className="flex items-center gap-6">
         <li className="mr-auto">
           <Link to="/" className="text-xl font-bold text-green-700">
-            AuPlant 🌱
+            <img className="w-30" src={"./src/assets/AuPlantLogo.png"} alt="" />
           </Link>
         </li>
 

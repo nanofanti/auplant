@@ -15,6 +15,10 @@ export type PlantSitter = {
   services: string[];
 };
 
+export type SitterProfileResponse = {
+  data: PlantSitter;
+};
+
 export type SitterResponse = {
   data: PlantSitter[];
 };

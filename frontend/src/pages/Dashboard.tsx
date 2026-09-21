@@ -1,20 +1,27 @@
-import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
+
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
+
+import { useAuth } from "../context/AuthContext";
+import CareRequestCard from "../components/CareRequestCard";
+import ConfirmModal from "../components/ConfirmModal";
+
 import {
   deleteCareRequest,
   getMyCareRequests,
   updateCareRequestStatus,
 } from "../services/careRequestService";
+import { getMySitterProfile } from "../services/sitterService";
+
 import type { CareRequest, CareRequestStatus } from "../types/CareRequest";
-import CareRequestCard from "../components/CareRequestCard";
-import { toast } from "sonner";
-import ConfirmModal from "../components/ConfirmModal";
-import { Link } from "react-router-dom";
+import type { PlantSitter } from "../types/PlantSitter";
 
 function Dashboard() {
   const { user } = useAuth();
   const [myCareRequests, setMyCareRequests] = useState<CareRequest[]>([]);
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
+  const [sitterProfile, setSitterProfile] = useState<PlantSitter | null>(null);
 
   useEffect(() => {
     const loadMyCareRequests = async () => {
@@ -25,6 +32,19 @@ function Dashboard() {
         console.error(error);
       }
     };
+
+    const loadMySitterProfile = async () => {
+      try {
+        const response = await getMySitterProfile();
+        if (response) {
+          setSitterProfile(response.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadMySitterProfile();
     loadMyCareRequests();
   }, []);
 
@@ -111,6 +131,36 @@ function Dashboard() {
           <strong>Roles:</strong> {user?.roles.join(", ")}
         </p>
       </section>
+      {sitterProfile && (
+        <section className="mt-10">
+          <h2 className="mb-4 text-xl font-semibold">My Sitter Profile</h2>
+
+          <p>
+            <strong>Location:</strong> {sitterProfile.location}
+          </p>
+
+          <p>
+            <strong>Bio:</strong> {sitterProfile.bio}
+          </p>
+
+          <p>
+            <strong>Experience:</strong> {sitterProfile.experience}
+          </p>
+
+          <p>
+            <strong>Price per day:</strong> {sitterProfile.pricePerDay} €
+          </p>
+
+          <p>
+            <strong>Availability:</strong>{" "}
+            {sitterProfile.availability ? "Available" : "Not available"}
+          </p>
+
+          <p>
+            <strong>Services:</strong> {sitterProfile.services.join(", ")}
+          </p>
+        </section>
+      )}
       <section className="mt-10">
         <h2 className="mb-4 text-xl font-semibold">My Care Requests</h2>
 
