@@ -53,8 +53,19 @@ function NavBar() {
         <li>
           {user ? (
             <div className="flex items-center gap-3">
-              <Link to="/dashboard">
+              <Link className="flex items-center gap-3" to="/dashboard">
                 <span className="text-sm">Hello {user.name}</span>
+                {user.profileImage ? (
+                  <img
+                    src={user.profileImage}
+                    alt={`${user.name}'s profile`}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-sm font-semibold text-green-800">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </Link>
 
               <button

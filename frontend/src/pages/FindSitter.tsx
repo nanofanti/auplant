@@ -24,13 +24,7 @@ function FindSitter() {
   return (
     <>
       {sitters.map((sitter) => {
-        return (
-          <SitterCard
-            key={sitter._id}
-            name={sitter.userId.name}
-            sitter={sitter}
-          />
-        );
+        return <SitterCard key={sitter._id} sitter={sitter} />;
       })}
       {loadError}
     </>

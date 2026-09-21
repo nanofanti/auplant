@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 
 import { Link } from "react-router-dom";
+
 import { toast } from "sonner";
 
 import { useAuth } from "../context/AuthContext";
+
 import CareRequestCard from "../components/CareRequestCard";
 import ConfirmModal from "../components/ConfirmModal";
 
@@ -12,13 +14,20 @@ import {
   getMyCareRequests,
   updateCareRequestStatus,
 } from "../services/careRequestService";
+import { uploadProfileImage } from "../services/userService";
 
 import type { CareRequest, CareRequestStatus } from "../types/CareRequest";
 
 function Dashboard() {
-  const { user, sitterProfile } = useAuth();
+  const { user, sitterProfile, refreshUser } = useAuth();
+
   const [myCareRequests, setMyCareRequests] = useState<CareRequest[]>([]);
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
+
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const loadMyCareRequests = async () => {
@@ -42,6 +51,7 @@ function Dashboard() {
 
     try {
       await updateCareRequestStatus(id, newStatus);
+
       setMyCareRequests((currentRequests) =>
         currentRequests.map((careRequest) =>
           careRequest._id === id
@@ -49,6 +59,7 @@ function Dashboard() {
             : careRequest,
         ),
       );
+
       toast.success(
         newStatus === "closed"
           ? "Care request closed"
@@ -97,6 +108,45 @@ function Dashboard() {
     }
   };
 
+  const handleProfileImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setProfileImageFile(file);
+
+    const previewUrl = URL.createObjectURL(file);
+    setProfileImagePreview(previewUrl);
+  };
+
+  const handleProfileImageUpload = async () => {
+    if (!profileImageFile) {
+      toast.error("Please select an image first");
+      return;
+    }
+
+    try {
+      await uploadProfileImage(profileImageFile);
+
+      await refreshUser();
+
+      setProfileImageFile(null);
+      setProfileImagePreview(null);
+
+      toast.success("Profile picture updated");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to upload profile picture");
+      }
+    }
+  };
+
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
       <header className="mb-10">
@@ -110,9 +160,63 @@ function Dashboard() {
           Manage your profile, sitter information and care requests.
         </p>
       </header>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl border border-gray-200 bg-green-300 p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-gray-900">My Profile</h2>
+
+          <div className="mt-5 flex items-center gap-4">
+            {profileImagePreview ? (
+              <img
+                src={profileImagePreview}
+                alt="Profile preview"
+                className="h-24 w-24 rounded-full object-cover"
+              />
+            ) : user?.profileImage ? (
+              <img
+                src={user.profileImage}
+                alt={`${user.name}'s profile`}
+                className="h-24 w-24 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 text-2xl font-semibold text-gray-500">
+                {user?.name?.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <div>
+              <label
+                htmlFor="profileImage"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                Profile picture
+              </label>
+
+              <input
+                id="profileImage"
+                type="file"
+                accept="image/*"
+                onChange={handleProfileImageChange}
+                className="block text-sm text-gray-700"
+              />
+            </div>
+          </div>
+
+          {profileImageFile && (
+            <div className="mt-3">
+              <p className="text-sm text-gray-600">
+                Selected: {profileImageFile.name}
+              </p>
+
+              <button
+                type="button"
+                onClick={handleProfileImageUpload}
+                className="mt-3 rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-800"
+              >
+                Upload picture
+              </button>
+            </div>
+          )}
 
           <div className="mt-5 space-y-3 text-gray-700">
             <p>
@@ -143,24 +247,31 @@ function Dashboard() {
         {sitterProfile && (
           <section className="rounded-2xl border border-green-200 bg-green-200 p-6 shadow-sm">
             <h2 className="mb-4 text-xl font-semibold">My Sitter Profile</h2>
+
             <p>
               <strong>Location:</strong> {sitterProfile.location}
             </p>
+
             <p>
               <strong>Bio:</strong> {sitterProfile.bio}
             </p>
+
             <p>
               <strong>Experience:</strong> {sitterProfile.experience}
             </p>
+
             <p>
               <strong>Price per day:</strong> {sitterProfile.pricePerDay} €
             </p>
+
             <p>
               <strong>Availability:</strong>{" "}
               {sitterProfile.availability ? "Available" : "Not available"}
             </p>
+
             <div>
               <strong>Services:</strong>
+
               <div className="mt-2 flex flex-wrap gap-2">
                 {sitterProfile.services.map((service) => (
                   <span
@@ -172,6 +283,7 @@ function Dashboard() {
                 ))}
               </div>
             </div>
+
             <Link
               to="/sitter-profile/edit"
               className="mt-4 inline-block rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
@@ -181,7 +293,8 @@ function Dashboard() {
           </section>
         )}
       </div>
-      <section className="rounded-2xl border border-green-200 bg-green-100 p-6 shadow-sm my-4">
+
+      <section className="my-4 rounded-2xl border border-green-200 bg-green-100 p-6 shadow-sm">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
@@ -222,6 +335,7 @@ function Dashboard() {
             {myCareRequests.map((careRequest) => (
               <div key={careRequest._id}>
                 <CareRequestCard careRequest={careRequest} />
+
                 <div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
@@ -240,6 +354,7 @@ function Dashboard() {
                         : "Reopen Request"}
                     </button>
                   </div>
+
                   <div className="my-2">
                     <Link
                       to={`/care-requests/${careRequest._id}/edit`}
@@ -247,6 +362,7 @@ function Dashboard() {
                     >
                       Edit
                     </Link>
+
                     <button
                       type="button"
                       onClick={() => setRequestToDelete(careRequest._id)}
@@ -261,6 +377,7 @@ function Dashboard() {
           </div>
         )}
       </section>
+
       {requestToDelete && (
         <ConfirmModal
           title="Delete care request?"

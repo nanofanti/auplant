@@ -9,7 +9,21 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
   return (
     <div className="rounded-xl border border-gray-500 p-6 m-4 shadow-sm">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">{careRequest.ownerId.name}</h2>
+        <div className="flex items-center gap-3">
+          {careRequest.ownerId.profileImage ? (
+            <img
+              src={careRequest.ownerId.profileImage}
+              alt={`${careRequest.ownerId.name}'s profile`}
+              className="h-10 w-10 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-sm font-semibold text-green-800">
+              {careRequest.ownerId.name.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <h2 className="text-xl font-semibold">{careRequest.ownerId.name}</h2>
+        </div>
+
         <span
           className={
             careRequest.status === "open"
