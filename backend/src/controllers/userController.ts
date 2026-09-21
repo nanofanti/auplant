@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import type { AuthRequest } from "../middleware/authMiddleware.js";
 import mongoose from "mongoose";
+import cloudinary from "../config/cloudinary.js";
+import type { UploadApiResponse } from "cloudinary";
 
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -124,4 +126,73 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
       isAdmin: user.isAdmin,
     },
   });
+};
+
+export const uploadProfileImage = async (req: AuthRequest, res: Response) => {
+  if (!req.userId) {
+    return res.status(401).json({
+      message: "Not authorized",
+    });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({
+      message: "No image provided",
+    });
+  }
+
+  try {
+    const uploadResult = await new Promise<UploadApiResponse>(
+      (resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "auplant/profile-images",
+          },
+          (error, result) => {
+            if (error) {
+              console.error("Cloudinary upload error:", error);
+              reject(error);
+              return;
+            }
+
+            if (!result) {
+              reject(new Error("Cloudinary upload returned no result"));
+              return;
+            }
+
+            resolve(result);
+          },
+        );
+
+        uploadStream.end(req.file!.buffer);
+      },
+    );
+
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      {
+        profileImage: uploadResult.secure_url,
+      },
+      {
+        new: true,
+      },
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Profile image updated successfully",
+      data: user,
+    });
+  } catch (error) {
+    console.error("FULL UPLOAD ERROR:", error);
+
+    return res.status(500).json({
+      message: "Failed to upload profile image",
+    });
+  }
 };

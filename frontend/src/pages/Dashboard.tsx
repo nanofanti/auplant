@@ -181,7 +181,7 @@ function Dashboard() {
           </section>
         )}
       </div>
-      <section className="mt-10">
+      <section className="rounded-2xl border border-green-200 bg-green-100 p-6 shadow-sm my-4">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
@@ -222,36 +222,40 @@ function Dashboard() {
             {myCareRequests.map((careRequest) => (
               <div key={careRequest._id}>
                 <CareRequestCard careRequest={careRequest} />
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleStatusChange(careRequest._id, careRequest.status)
-                    }
-                    className={`rounded-lg px-4 py-2 text-sm font-medium ${
-                      careRequest.status === "open"
-                        ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
-                        : "bg-green-100 text-green-800 hover:bg-green-200"
-                    }`}
-                  >
-                    {careRequest.status === "open"
-                      ? "Close Request"
-                      : "Reopen Request"}
-                  </button>
+                <div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleStatusChange(careRequest._id, careRequest.status)
+                      }
+                      className={`rounded-lg px-4 py-2 text-sm font-medium ${
+                        careRequest.status === "open"
+                          ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
+                          : "bg-green-100 text-green-800 hover:bg-green-200"
+                      }`}
+                    >
+                      {careRequest.status === "open"
+                        ? "Close Request"
+                        : "Reopen Request"}
+                    </button>
+                  </div>
+                  <div className="my-2">
+                    <Link
+                      to={`/care-requests/${careRequest._id}/edit`}
+                      className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setRequestToDelete(careRequest._id)}
+                      className="rounded-lg px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-                <Link
-                  to={`/care-requests/${careRequest._id}/edit`}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                >
-                  Edit
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setRequestToDelete(careRequest._id)}
-                  className="rounded-lg px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
-                >
-                  Delete
-                </button>
               </div>
             ))}
           </div>
