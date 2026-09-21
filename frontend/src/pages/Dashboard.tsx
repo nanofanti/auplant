@@ -159,6 +159,12 @@ function Dashboard() {
           <p>
             <strong>Services:</strong> {sitterProfile.services.join(", ")}
           </p>
+          <Link
+            to="/sitter-profile/edit"
+            className="mt-4 inline-block rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          >
+            Edit Sitter Profile
+          </Link>
         </section>
       )}
       <section className="mt-10">

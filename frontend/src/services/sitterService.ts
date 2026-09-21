@@ -3,6 +3,7 @@ import type {
   CreateSitterData,
   CreateSitterResponse,
   SitterProfileResponse,
+  UpdateSitterData,
 } from "../types/PlantSitter";
 
 export async function getSitters(): Promise<SitterResponse> {
@@ -51,6 +52,28 @@ export async function getMySitterProfile(): Promise<SitterProfileResponse | null
 
   if (!response.ok) {
     throw new Error(data.message || "Failed to fetch sitter profile");
+  }
+
+  return data;
+}
+
+export async function updateSitterProfile(
+  id: string,
+  updates: UpdateSitterData,
+): Promise<SitterProfileResponse> {
+  const response = await fetch(`http://localhost:8080/api/sitters/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(updates),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update sitter profile");
   }
 
   return data;

@@ -9,6 +9,7 @@ import CareRequests from "./pages/CareRequests";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import EditCareRequest from "./pages/EditCareRequest";
+import EditSitterProfile from "./pages/EditSitterProfile";
 import { Toaster } from "sonner";
 
 import "./App.css";
@@ -30,6 +31,10 @@ function App() {
             <Route
               path="/care-requests/:id/edit"
               element={<EditCareRequest />}
+            />
+            <Route
+              path="/sitter-profile/edit"
+              element={<EditSitterProfile />}
             />
           </Route>
           <Route path="/care-requests" element={<CareRequests />} />

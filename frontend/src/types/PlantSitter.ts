@@ -47,3 +47,12 @@ export type CreateSitterResponse = {
   message: string;
   data: CreatedSitterProfile;
 };
+
+export type UpdateSitterData = {
+  location: string;
+  bio: string;
+  experience: string;
+  pricePerDay: number;
+  availability: boolean;
+  services: string[];
+};
