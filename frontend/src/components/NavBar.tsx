@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function NavBar() {
-  const { user, logout } = useAuth();
+  const { user, logout, sitterProfile } = useAuth();
 
   return (
     <nav className="border-b border-gray-200 bg-white px-6 py-4">
@@ -29,12 +29,18 @@ function NavBar() {
           </Link>
         </li>
         <li className="py-4">
-          <Link
-            className="font-medium hover:text-green-700"
-            to="/become-sitter"
-          >
-            Become a Sitter
-          </Link>
+          {sitterProfile ? (
+            <Link className="font-medium hover:text-green-700" to="/dashboard">
+              My Sitter Profile
+            </Link>
+          ) : (
+            <Link
+              className="font-medium hover:text-green-700"
+              to="/become-sitter"
+            >
+              Become a Sitter
+            </Link>
+          )}
         </li>
         <li>
           <Link

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const { setUser } = useAuth();
+  const { setUser, refreshSitterProfile } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
@@ -16,13 +16,13 @@ function Login() {
     event.preventDefault();
 
     try {
-      const response = await login(email, password);
-      console.log(response);
+      await login(email, password);
       const meResponse = await getMe();
       console.log(meResponse);
 
       setUser(meResponse.data);
       toast.success("Login successful");
+      await refreshSitterProfile();
       navigate(from, { replace: true });
     } catch {
       toast.error("Email or password is incorrect");
