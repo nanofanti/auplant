@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -14,7 +14,18 @@ function CreateCareRequest() {
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [offeredPrice, setOfferedPrice] = useState<number>(0);
 
+  const photoPreviewsRef = useRef<string[]>([]);
+
   const navigate = useNavigate();
+
+  // Clean up temporary preview URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      photoPreviewsRef.current.forEach((preview) => {
+        URL.revokeObjectURL(preview);
+      });
+    };
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,20 +70,52 @@ function CreateCareRequest() {
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files ?? []);
 
-    if (selectedFiles.length > 5) {
-      toast.error("You can upload a maximum of 5 images");
+    // Validate file type
+    const invalidType = selectedFiles.find(
+      (file) => !file.type.startsWith("image/"),
+    );
+
+    if (invalidType) {
+      toast.error("Only image files are allowed");
+      event.target.value = "";
       return;
     }
 
-    photoPreviews.forEach((preview) => {
+    // Validate file size
+    const maxFileSize = 5 * 1024 * 1024;
+
+    const oversizedFile = selectedFiles.find((file) => file.size > maxFileSize);
+
+    if (oversizedFile) {
+      toast.error("Each image must be smaller than 5 MB");
+      event.target.value = "";
+      return;
+    }
+
+    // Validate number of images
+    if (selectedFiles.length > 5) {
+      toast.error("You can upload a maximum of 5 images");
+      event.target.value = "";
+      return;
+    }
+
+    // Clean up previews from the previous selection
+    photoPreviewsRef.current.forEach((preview) => {
       URL.revokeObjectURL(preview);
     });
 
+    // Store the selected files
     setPhotos(selectedFiles);
 
+    // Create new temporary preview URLs
     const previewUrls = selectedFiles.map((file) => URL.createObjectURL(file));
 
+    photoPreviewsRef.current = previewUrls;
+
     setPhotoPreviews(previewUrls);
+
+    // Reset input so the same files can be selected again
+    event.target.value = "";
   };
 
   return (
@@ -208,7 +251,7 @@ function CreateCareRequest() {
           />
 
           <p className="mt-2 text-xs text-gray-500">
-            You can upload up to 5 images.
+            Maximum 5 photos. Maximum 5 MB per image.
           </p>
 
           {photoPreviews.length > 0 && (

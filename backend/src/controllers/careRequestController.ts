@@ -1,10 +1,16 @@
-import type { Response, Request } from "express";
+import type { Request, Response } from "express";
 import mongoose from "mongoose";
+
+import type { AuthRequest } from "../middleware/authMiddleware.js";
+
 import CareRequest from "../models/CareRequest.js";
 import User from "../models/User.js";
-import type { AuthRequest } from "../middleware/authMiddleware.js";
-import cloudinary from "../config/cloudinary.js";
-import type { UploadApiResponse } from "cloudinary";
+
+import {
+  deleteImage,
+  uploadImage,
+  type UploadedImage,
+} from "../utils/cloudinaryUpload.js";
 
 export const createCareRequest = async (req: AuthRequest, res: Response) => {
   if (!req.userId) {
@@ -38,44 +44,19 @@ export const createCareRequest = async (req: AuthRequest, res: Response) => {
     offeredPrice,
   } = req.body;
 
-  const files = req.files as Express.Multer.File[];
+  const files = (req.files as Express.Multer.File[] | undefined) ?? [];
+
+  const uploadedPhotos: UploadedImage[] = [];
 
   try {
-    // Upload all selected images to Cloudinary
-    const uploadResults = await Promise.all(
-      files.map(
-        (file) =>
-          new Promise<UploadApiResponse>((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-              {
-                folder: "auplant/care-requests",
-              },
-              (error, result) => {
-                if (error) {
-                  console.error("Cloudinary upload error:", error);
-                  reject(error);
-                  return;
-                }
+    // Upload selected images one by one.
+    // This allows us to keep track of successful uploads
+    // in case a later upload or MongoDB operation fails.
+    for (const file of files) {
+      const uploadedPhoto = await uploadImage(file, "auplant/care-requests");
 
-                if (!result) {
-                  reject(new Error("Cloudinary upload returned no result"));
-                  return;
-                }
-
-                resolve(result);
-              },
-            );
-
-            uploadStream.end(file.buffer);
-          }),
-      ),
-    );
-
-    // Get only the URL of each uploaded image
-    const photos = uploadResults.map((result) => ({
-      url: result.secure_url,
-      publicId: result.public_id,
-    }));
+      uploadedPhotos.push(uploadedPhoto);
+    }
 
     // Create the Care Request only after all uploads succeed
     const newCareRequest = await CareRequest.create({
@@ -85,7 +66,7 @@ export const createCareRequest = async (req: AuthRequest, res: Response) => {
       endDate,
       numberOfPlants,
       description,
-      photos,
+      photos: uploadedPhotos,
       offeredPrice,
     });
 
@@ -95,6 +76,12 @@ export const createCareRequest = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error("Care request creation error:", error);
+
+    // If an upload or MongoDB operation failed,
+    // remove any images that were already uploaded.
+    await Promise.allSettled(
+      uploadedPhotos.map((photo) => deleteImage(photo.publicId)),
+    );
 
     return res.status(500).json({
       message: "Failed to create care request",
@@ -260,60 +247,34 @@ export const updateCareRequest = async (req: AuthRequest, res: Response) => {
     careRequest.status = status;
   }
 
+  const uploadedPhotos: UploadedImage[] = [];
+
   try {
-    // Upload new photos to Cloudinary
-    const uploadResults = await Promise.all(
-      files.map(
-        (file) =>
-          new Promise<UploadApiResponse>((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-              {
-                folder: "auplant/care-requests",
-              },
-              (error, result) => {
-                if (error) {
-                  console.error("Cloudinary upload error:", error);
-                  reject(error);
-                  return;
-                }
+    // Upload new photos one by one so successful uploads
+    // can be cleaned up if something later fails.
+    for (const file of files) {
+      const uploadedPhoto = await uploadImage(file, "auplant/care-requests");
 
-                if (!result) {
-                  reject(new Error("Cloudinary upload returned no result"));
-                  return;
-                }
+      uploadedPhotos.push(uploadedPhoto);
+    }
 
-                resolve(result);
-              },
-            );
-
-            uploadStream.end(file.buffer);
-          }),
-      ),
-    );
-
-    // Convert Cloudinary results into our photo structure
-    const newPhotoObjects = uploadResults.map((result) => ({
-      url: result.secure_url,
-      publicId: result.public_id,
-    }));
-
-    // Delete removed photos from Cloudinary
-    await Promise.all(
-      validRemovedPhotoPublicIds.map((publicId) =>
-        cloudinary.uploader.destroy(publicId),
-      ),
-    );
-
-    // Remove deleted photos from the Care Request
+    // Remove selected photos from the MongoDB document.
+    // We do NOT delete them from Cloudinary yet.
     careRequest.photos = careRequest.photos.filter(
       (photo) => !validRemovedPhotoPublicIds.includes(photo.publicId),
     );
 
-    // Add newly uploaded photos
-    careRequest.photos.push(...newPhotoObjects);
+    // Add newly uploaded photos to the document
+    careRequest.photos.push(...uploadedPhotos);
 
-    // Save final Care Request
+    // Save MongoDB first
     await careRequest.save();
+
+    // MongoDB successfully saved the new photo state.
+    // We can now safely remove the old Cloudinary images.
+    await Promise.allSettled(
+      validRemovedPhotoPublicIds.map((publicId) => deleteImage(publicId)),
+    );
 
     return res.status(200).json({
       message: "Care request updated successfully",
@@ -321,6 +282,12 @@ export const updateCareRequest = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error("Care request update error:", error);
+
+    // The update failed, so remove any newly uploaded
+    // Cloudinary images to avoid orphaned assets.
+    await Promise.allSettled(
+      uploadedPhotos.map((photo) => deleteImage(photo.publicId)),
+    );
 
     return res.status(500).json({
       message: "Failed to update care request",
@@ -332,17 +299,23 @@ export const deleteCareRequest = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
 
   if (typeof id !== "string") {
-    return res.status(400).json({ message: "Invalid care request ID" });
+    return res.status(400).json({
+      message: "Invalid care request ID",
+    });
   }
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "Invalid care request ID" });
+    return res.status(400).json({
+      message: "Invalid care request ID",
+    });
   }
 
   const careRequest = await CareRequest.findById(id);
 
   if (!careRequest) {
-    return res.status(404).json({ message: "Care request not found" });
+    return res.status(404).json({
+      message: "Care request not found",
+    });
   }
 
   if (careRequest.ownerId.toString() !== req.userId) {
@@ -351,17 +324,37 @@ export const deleteCareRequest = async (req: AuthRequest, res: Response) => {
     });
   }
 
-  await careRequest.deleteOne();
+  // Keep the Cloudinary IDs before deleting the MongoDB document
+  const photoPublicIds = careRequest.photos.map((photo) => photo.publicId);
 
-  return res.status(200).json({
-    message: "Care request deleted successfully",
-  });
+  try {
+    // Delete the Care Request from MongoDB first
+    await careRequest.deleteOne();
+
+    // Then clean up its images from Cloudinary
+    await Promise.allSettled(
+      photoPublicIds.map((publicId) => deleteImage(publicId)),
+    );
+
+    return res.status(200).json({
+      message: "Care request deleted successfully",
+    });
+  } catch (error) {
+    console.error("Care request deletion error:", error);
+
+    return res.status(500).json({
+      message: "Failed to delete care request",
+    });
+  }
 };
 
 export const getMyCareRequests = async (req: AuthRequest, res: Response) => {
   if (!req.userId) {
-    return res.status(401).json({ message: "Not authorized" });
+    return res.status(401).json({
+      message: "Not authorized",
+    });
   }
+
   const myCareRequests = await CareRequest.find({
     ownerId: req.userId,
   }).populate("ownerId", "name profileImage");
