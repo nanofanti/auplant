@@ -1,13 +1,8 @@
 export type CareRequestStatus = "open" | "closed";
 
-export type CreateCareRequestData = {
-  location: string;
-  startDate: string;
-  endDate: string;
-  numberOfPlants: number;
-  description: string;
-  photos: string[];
-  offeredPrice: number;
+export type CareRequestPhoto = {
+  url: string;
+  publicId: string;
 };
 
 export type CreatedCareRequest = {
@@ -18,7 +13,7 @@ export type CreatedCareRequest = {
   endDate: string;
   numberOfPlants: number;
   description: string;
-  photos: string[];
+  photos: CareRequestPhoto[];
   offeredPrice: number;
   status: CareRequestStatus;
 };
@@ -42,7 +37,7 @@ export type CareRequest = {
   endDate: string;
   numberOfPlants: number;
   description: string;
-  photos: string[];
+  photos: CareRequestPhoto[];
   offeredPrice: number;
   status: CareRequestStatus;
 };
@@ -51,7 +46,16 @@ export type CareRequestsResponse = {
   data: CareRequest[];
 };
 
-export type UpdateCareRequestData = Partial<CreateCareRequestData>;
+export type UpdateCareRequestData = {
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+  numberOfPlants?: number;
+  description?: string;
+  offeredPrice?: number;
+  status?: CareRequestStatus;
+  removedPhotoPublicIds?: string[];
+};
 
 export type CareRequestResponse = {
   data: CareRequest;

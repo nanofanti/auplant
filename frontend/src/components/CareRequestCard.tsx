@@ -102,7 +102,7 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
           <div className="mt-5 grid grid-cols-2 gap-2">
             {careRequest.photos.map((photo, index) => (
               <button
-                key={photo}
+                key={photo.publicId}
                 type="button"
                 onClick={() => setSelectedPhotoIndex(index)}
                 className={`cursor-pointer overflow-hidden rounded-xl ${
@@ -112,7 +112,7 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
                 }`}
               >
                 <img
-                  src={photo}
+                  src={photo.url}
                   alt={`Plant ${index + 1}`}
                   className="h-48 w-full object-cover transition-transform hover:scale-105"
                 />
@@ -186,7 +186,7 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
 
             {/* Current image */}
             <img
-              src={careRequest.photos[selectedPhotoIndex]}
+              src={careRequest.photos[selectedPhotoIndex].url}
               alt={`Plant ${selectedPhotoIndex + 1}`}
               className="max-h-[85vh] max-w-[90vw] rounded-xl object-contain"
             />

@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+interface ICareRequestPhoto {
+  url: string;
+  publicId: string;
+}
+
 interface ICareRequest {
   ownerId: mongoose.Types.ObjectId;
   location: string;
@@ -7,7 +12,7 @@ interface ICareRequest {
   endDate: Date;
   numberOfPlants: number;
   description: string;
-  photos: string[];
+  photos: ICareRequestPhoto[];
   offeredPrice: number;
   status: "open" | "closed";
 }
@@ -40,7 +45,18 @@ const careRequestSchema = new mongoose.Schema<ICareRequest>(
       required: true,
     },
     photos: {
-      type: [String],
+      type: [
+        {
+          url: {
+            type: String,
+            required: true,
+          },
+          publicId: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
       default: [],
     },
     offeredPrice: {

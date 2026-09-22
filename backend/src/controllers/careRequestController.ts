@@ -72,7 +72,10 @@ export const createCareRequest = async (req: AuthRequest, res: Response) => {
     );
 
     // Get only the URL of each uploaded image
-    const photoUrls = uploadResults.map((result) => result.secure_url);
+    const photos = uploadResults.map((result) => ({
+      url: result.secure_url,
+      publicId: result.public_id,
+    }));
 
     // Create the Care Request only after all uploads succeed
     const newCareRequest = await CareRequest.create({
@@ -82,7 +85,7 @@ export const createCareRequest = async (req: AuthRequest, res: Response) => {
       endDate,
       numberOfPlants,
       description,
-      photos: photoUrls,
+      photos,
       offeredPrice,
     });
 
@@ -176,11 +179,28 @@ export const updateCareRequest = async (req: AuthRequest, res: Response) => {
     endDate,
     numberOfPlants,
     description,
-    photos,
     offeredPrice,
     status,
+    removedPhotoPublicIds,
   } = req.body;
 
+  // Validate requested photo removals
+  const validRemovedPhotoPublicIds = Array.isArray(removedPhotoPublicIds)
+    ? removedPhotoPublicIds.filter((publicId) =>
+        careRequest.photos.some((photo) => photo.publicId === publicId),
+      )
+    : [];
+
+  if (
+    Array.isArray(removedPhotoPublicIds) &&
+    validRemovedPhotoPublicIds.length !== removedPhotoPublicIds.length
+  ) {
+    return res.status(400).json({
+      message: "One or more photos do not belong to this care request",
+    });
+  }
+
+  // Update normal fields
   if (location !== undefined) {
     careRequest.location = location;
   }
@@ -192,28 +212,47 @@ export const updateCareRequest = async (req: AuthRequest, res: Response) => {
   if (endDate !== undefined) {
     careRequest.endDate = endDate;
   }
+
   if (numberOfPlants !== undefined) {
     careRequest.numberOfPlants = numberOfPlants;
   }
+
   if (description !== undefined) {
     careRequest.description = description;
   }
-  if (photos !== undefined) {
-    careRequest.photos = photos;
-  }
+
   if (offeredPrice !== undefined) {
     careRequest.offeredPrice = offeredPrice;
   }
+
   if (status !== undefined) {
     careRequest.status = status;
   }
 
-  await careRequest.save();
+  try {
+    await Promise.all(
+      validRemovedPhotoPublicIds.map((publicId) =>
+        cloudinary.uploader.destroy(publicId),
+      ),
+    );
 
-  return res.status(200).json({
-    message: "Care request updated successfully",
-    data: careRequest,
-  });
+    careRequest.photos = careRequest.photos.filter(
+      (photo) => !validRemovedPhotoPublicIds.includes(photo.publicId),
+    );
+
+    await careRequest.save();
+
+    return res.status(200).json({
+      message: "Care request updated successfully",
+      data: careRequest,
+    });
+  } catch (error) {
+    console.error("Care request update error:", error);
+
+    return res.status(500).json({
+      message: "Failed to update care request",
+    });
+  }
 };
 
 export const deleteCareRequest = async (req: AuthRequest, res: Response) => {

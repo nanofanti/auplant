@@ -4,7 +4,10 @@ import {
   getCareRequestById,
   updateCareRequest,
 } from "../services/careRequestService";
-import type { UpdateCareRequestData } from "../types/CareRequest";
+import type {
+  UpdateCareRequestData,
+  CareRequestPhoto,
+} from "../types/CareRequest";
 import { toast } from "sonner";
 
 function EditCareRequest() {
@@ -15,9 +18,10 @@ function EditCareRequest() {
     endDate: "",
     numberOfPlants: 0,
     description: "",
-    photos: [],
     offeredPrice: 0,
   });
+  const [existingPhotos, setExistingPhotos] = useState<CareRequestPhoto[]>([]);
+  const [removedPhotos, setRemovedPhotos] = useState<CareRequestPhoto[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,9 +38,10 @@ function EditCareRequest() {
           endDate: response.data.endDate.slice(0, 10),
           numberOfPlants: response.data.numberOfPlants,
           description: response.data.description,
-          photos: response.data.photos,
           offeredPrice: response.data.offeredPrice,
         });
+
+        setExistingPhotos(response.data.photos);
       } catch (error) {
         console.error(error);
       }
@@ -64,7 +69,11 @@ function EditCareRequest() {
     }
 
     try {
-      await updateCareRequest(id, formData);
+      const updateData: UpdateCareRequestData = {
+        ...formData,
+        removedPhotoPublicIds: removedPhotos.map((photo) => photo.publicId),
+      };
+      await updateCareRequest(id, updateData);
 
       toast.success("Care request updated successfully");
       navigate("/dashboard");
@@ -75,6 +84,20 @@ function EditCareRequest() {
         toast.error("Failed to update care request");
       }
     }
+  };
+
+  const handleRemoveExistingPhotos = (publicId: string) => {
+    const photoToRemove = existingPhotos.find(
+      (photo) => photo.publicId === publicId,
+    );
+
+    if (!photoToRemove) return;
+
+    setExistingPhotos((currentPhotos) =>
+      currentPhotos.filter((photo) => photo.publicId !== publicId),
+    );
+
+    setRemovedPhotos((currentPhotos) => [...currentPhotos, photoToRemove]);
   };
 
   return (
@@ -165,6 +188,31 @@ function EditCareRequest() {
             className="w-full rounded-lg border border-gray-300 px-4 py-2"
           />
         </div>
+        {existingPhotos.length > 0 && (
+          <div>
+            <label className="mb-2 block font-medium">Current photos</label>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {existingPhotos.map((photo, index) => (
+                <div key={photo.publicId} className="relative">
+                  <img
+                    src={photo.url}
+                    alt={`Plant ${index + 1}`}
+                    className="h-32 w-full rounded-xl object-cover"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveExistingPhotos(photo.publicId)}
+                    className="absolute right-2 top-2 cursor-pointer rounded-lg bg-red-600 px-2 py-1 text-sm text-white hover:bg-red-700"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <button
           type="submit"
           className="rounded-lg bg-green-700 px-4 py-2 text-white hover:bg-green-800"
