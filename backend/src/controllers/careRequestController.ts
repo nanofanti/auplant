@@ -181,22 +181,53 @@ export const updateCareRequest = async (req: AuthRequest, res: Response) => {
     description,
     offeredPrice,
     status,
-    removedPhotoPublicIds,
   } = req.body;
 
-  // Validate requested photo removals
-  const validRemovedPhotoPublicIds = Array.isArray(removedPhotoPublicIds)
-    ? removedPhotoPublicIds.filter((publicId) =>
-        careRequest.photos.some((photo) => photo.publicId === publicId),
-      )
-    : [];
+  // Parse removed photo IDs from FormData
+  let removedPhotoPublicIds: string[] = [];
 
+  if (req.body.removedPhotoPublicIds) {
+    try {
+      removedPhotoPublicIds = JSON.parse(req.body.removedPhotoPublicIds);
+    } catch {
+      return res.status(400).json({
+        message: "Invalid removed photo data",
+      });
+    }
+  }
+
+  // Make sure the parsed value is really an array of strings
   if (
-    Array.isArray(removedPhotoPublicIds) &&
-    validRemovedPhotoPublicIds.length !== removedPhotoPublicIds.length
+    !Array.isArray(removedPhotoPublicIds) ||
+    !removedPhotoPublicIds.every((publicId) => typeof publicId === "string")
   ) {
     return res.status(400).json({
+      message: "Invalid removed photo data",
+    });
+  }
+
+  const files = (req.files as Express.Multer.File[] | undefined) ?? [];
+
+  // Only allow removal of photos belonging to this Care Request
+  const validRemovedPhotoPublicIds = removedPhotoPublicIds.filter((publicId) =>
+    careRequest.photos.some((photo) => photo.publicId === publicId),
+  );
+
+  if (validRemovedPhotoPublicIds.length !== removedPhotoPublicIds.length) {
+    return res.status(400).json({
       message: "One or more photos do not belong to this care request",
+    });
+  }
+
+  // Check maximum final number of photos
+  const remainingPhotoCount =
+    careRequest.photos.length - validRemovedPhotoPublicIds.length;
+
+  const finalPhotoCount = remainingPhotoCount + files.length;
+
+  if (finalPhotoCount > 5) {
+    return res.status(400).json({
+      message: "A care request can have a maximum of 5 photos",
     });
   }
 
@@ -230,16 +261,58 @@ export const updateCareRequest = async (req: AuthRequest, res: Response) => {
   }
 
   try {
+    // Upload new photos to Cloudinary
+    const uploadResults = await Promise.all(
+      files.map(
+        (file) =>
+          new Promise<UploadApiResponse>((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: "auplant/care-requests",
+              },
+              (error, result) => {
+                if (error) {
+                  console.error("Cloudinary upload error:", error);
+                  reject(error);
+                  return;
+                }
+
+                if (!result) {
+                  reject(new Error("Cloudinary upload returned no result"));
+                  return;
+                }
+
+                resolve(result);
+              },
+            );
+
+            uploadStream.end(file.buffer);
+          }),
+      ),
+    );
+
+    // Convert Cloudinary results into our photo structure
+    const newPhotoObjects = uploadResults.map((result) => ({
+      url: result.secure_url,
+      publicId: result.public_id,
+    }));
+
+    // Delete removed photos from Cloudinary
     await Promise.all(
       validRemovedPhotoPublicIds.map((publicId) =>
         cloudinary.uploader.destroy(publicId),
       ),
     );
 
+    // Remove deleted photos from the Care Request
     careRequest.photos = careRequest.photos.filter(
       (photo) => !validRemovedPhotoPublicIds.includes(photo.publicId),
     );
 
+    // Add newly uploaded photos
+    careRequest.photos.push(...newPhotoObjects);
+
+    // Save final Care Request
     await careRequest.save();
 
     return res.status(200).json({

@@ -3,7 +3,6 @@ import type {
   CareRequestResponse,
   CreateCareRequestResponse,
   CareRequestStatus,
-  UpdateCareRequestData,
 } from "../types/CareRequest";
 
 export async function createCareRequest(
@@ -83,6 +82,7 @@ export async function deleteCareRequest(id: string) {
       credentials: "include",
     },
   );
+
   const data = await response.json();
 
   if (!response.ok) {
@@ -94,17 +94,14 @@ export async function deleteCareRequest(id: string) {
 
 export async function updateCareRequest(
   id: string,
-  updates: UpdateCareRequestData,
-) {
+  formData: FormData,
+): Promise<CareRequestResponse> {
   const response = await fetch(
     `http://localhost:8080/api/care-requests/${id}`,
     {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
       credentials: "include",
-      body: JSON.stringify(updates),
+      body: formData,
     },
   );
 

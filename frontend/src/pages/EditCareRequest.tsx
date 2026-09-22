@@ -22,6 +22,8 @@ function EditCareRequest() {
   });
   const [existingPhotos, setExistingPhotos] = useState<CareRequestPhoto[]>([]);
   const [removedPhotos, setRemovedPhotos] = useState<CareRequestPhoto[]>([]);
+  const [newPhotos, setNewPhotos] = useState<File[]>([]);
+  const [newPhotoPreviews, setNewPhotoPreviews] = useState<string[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,10 +71,41 @@ function EditCareRequest() {
     }
 
     try {
-      const updateData: UpdateCareRequestData = {
-        ...formData,
-        removedPhotoPublicIds: removedPhotos.map((photo) => photo.publicId),
-      };
+      const updateData = new FormData();
+
+      if (formData.location !== undefined) {
+        updateData.append("location", formData.location);
+      }
+
+      if (formData.startDate !== undefined) {
+        updateData.append("startDate", formData.startDate);
+      }
+
+      if (formData.endDate !== undefined) {
+        updateData.append("endDate", formData.endDate);
+      }
+
+      if (formData.numberOfPlants !== undefined) {
+        updateData.append("numberOfPlants", formData.numberOfPlants.toString());
+      }
+
+      if (formData.description !== undefined) {
+        updateData.append("description", formData.description);
+      }
+
+      if (formData.offeredPrice !== undefined) {
+        updateData.append("offeredPrice", formData.offeredPrice.toString());
+      }
+
+      updateData.append(
+        "removedPhotoPublicIds",
+        JSON.stringify(removedPhotos.map((photo) => photo.publicId)),
+      );
+
+      newPhotos.forEach((photo) => {
+        updateData.append("photos", photo);
+      });
+
       await updateCareRequest(id, updateData);
 
       toast.success("Care request updated successfully");
@@ -86,7 +119,7 @@ function EditCareRequest() {
     }
   };
 
-  const handleRemoveExistingPhotos = (publicId: string) => {
+  const handleRemoveExistingPhoto = (publicId: string) => {
     const photoToRemove = existingPhotos.find(
       (photo) => photo.publicId === publicId,
     );
@@ -98,6 +131,32 @@ function EditCareRequest() {
     );
 
     setRemovedPhotos((currentPhotos) => [...currentPhotos, photoToRemove]);
+  };
+
+  const handleNewPhotosChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const selectedFiles = Array.from(event.target.files ?? []);
+
+    const totalPhotos =
+      existingPhotos.length + newPhotos.length + selectedFiles.length;
+
+    if (totalPhotos > 5) {
+      toast.error("You can have a maximum of 5 photos");
+      event.target.value = "";
+      return;
+    }
+
+    const previewUrls = selectedFiles.map((file) => URL.createObjectURL(file));
+
+    setNewPhotos((currentPhotos) => [...currentPhotos, ...selectedFiles]);
+
+    setNewPhotoPreviews((currentPreviews) => [
+      ...currentPreviews,
+      ...previewUrls,
+    ]);
+
+    event.target.value = "";
   };
 
   return (
@@ -190,26 +249,70 @@ function EditCareRequest() {
         </div>
         {existingPhotos.length > 0 && (
           <div>
-            <label className="mb-2 block font-medium">Current photos</label>
-
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {existingPhotos.map((photo, index) => (
-                <div key={photo.publicId} className="relative">
-                  <img
-                    src={photo.url}
-                    alt={`Plant ${index + 1}`}
-                    className="h-32 w-full rounded-xl object-cover"
-                  />
+              {/* Existing photos */}
+              {existingPhotos.length > 0 && (
+                <div>
+                  <label className="mb-2 block font-medium">
+                    Current photos
+                  </label>
 
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveExistingPhotos(photo.publicId)}
-                    className="absolute right-2 top-2 cursor-pointer rounded-lg bg-red-600 px-2 py-1 text-sm text-white hover:bg-red-700"
-                  >
-                    Remove
-                  </button>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {existingPhotos.map((photo, index) => (
+                      <div key={photo.publicId} className="relative">
+                        <img
+                          src={photo.url}
+                          alt={`Plant ${index + 1}`}
+                          className="h-32 w-full rounded-xl object-cover"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleRemoveExistingPhoto(photo.publicId)
+                          }
+                          className="absolute right-2 top-2 cursor-pointer rounded-lg bg-red-600 px-2 py-1 text-sm text-white hover:bg-red-700"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
+              )}
+
+              {/* Add new photos */}
+              <div>
+                <label htmlFor="newPhotos" className="mb-2 block font-medium">
+                  Add new photos
+                </label>
+                <input
+                  id="newPhotos"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleNewPhotosChange}
+                  className="block w-full text-sm text-gray-700"
+                />
+              </div>
+
+              {/* New photo previews */}
+              {newPhotoPreviews.length > 0 && (
+                <div>
+                  <p className="mb-2 font-medium">New photos</p>
+
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {newPhotoPreviews.map((preview, index) => (
+                      <img
+                        key={preview}
+                        src={preview}
+                        alt={`New plant preview ${index + 1}`}
+                        className="h-32 w-full rounded-xl object-cover"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

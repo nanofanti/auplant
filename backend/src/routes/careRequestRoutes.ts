@@ -22,7 +22,7 @@ router.get("/me", protect, getMyCareRequests);
 
 router.get("/:id", getCareRequestById);
 
-router.patch("/:id", protect, updateCareRequest);
+router.patch("/:id", protect, upload.array("photos", 5), updateCareRequest);
 
 router.delete("/:id", protect, deleteCareRequest);
 
