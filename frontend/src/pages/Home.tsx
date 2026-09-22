@@ -109,6 +109,32 @@ function Home() {
         </div>
       </section>
 
+      {/* Instructions */}
+
+      <section className="bg-auplant-sage px-6 py-16">
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="mb-2 font-semibold text-auplant-green">
+            New to AuPlant?
+          </p>
+
+          <h2 className="text-3xl font-bold text-auplant-dark">
+            Not sure where to start?
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-2xl text-lg">
+            Learn how AuPlant works, whether you're looking for someone to care
+            for your plants or you'd like to become a plant sitter yourself.
+          </p>
+
+          <Link
+            to="/instructions"
+            className="mt-8 inline-block rounded-xl bg-auplant-green px-6 py-3 font-semibold text-white transition hover:bg-auplant-dark"
+          >
+            How AuPlant Works →
+          </Link>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="bg-auplant-dark">
         <div className="mx-auto max-w-6xl px-6 py-20 text-center">

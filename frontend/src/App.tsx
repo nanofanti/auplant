@@ -13,6 +13,7 @@ import EditSitterProfile from "./pages/EditSitterProfile";
 import { Toaster } from "sonner";
 
 import "./App.css";
+import Instructions from "./pages/Instructions";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             />
           </Route>
           <Route path="/care-requests" element={<CareRequests />} />
+          <Route path="/instructions" element={<Instructions />} />
           <Route path="/login" element={<Login />} />
         </Route>
       </Routes>
