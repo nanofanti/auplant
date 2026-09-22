@@ -1,22 +1,18 @@
 import type {
   CareRequestsResponse,
   CareRequestResponse,
-  CreateCareRequestData,
   CreateCareRequestResponse,
   CareRequestStatus,
   UpdateCareRequestData,
 } from "../types/CareRequest";
 
 export async function createCareRequest(
-  careRequestData: CreateCareRequestData,
+  formData: FormData,
 ): Promise<CreateCareRequestResponse> {
   const response = await fetch("http://localhost:8080/api/care-requests", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     credentials: "include",
-    body: JSON.stringify(careRequestData),
+    body: formData,
   });
 
   const data = await response.json();

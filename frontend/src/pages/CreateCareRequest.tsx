@@ -4,15 +4,14 @@ import { toast } from "sonner";
 
 import { createCareRequest } from "../services/careRequestService";
 
-import type { CreateCareRequestData } from "../types/CareRequest";
-
 function CreateCareRequest() {
   const [location, setLocation] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [numberOfPlants, setNumberOfPlants] = useState<number>(0);
   const [description, setDescription] = useState<string>("");
-  const [photos, setPhotos] = useState<string>("");
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [offeredPrice, setOfferedPrice] = useState<number>(0);
 
   const navigate = useNavigate();
@@ -20,21 +19,21 @@ function CreateCareRequest() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const careRequestData: CreateCareRequestData = {
-      location,
-      startDate,
-      endDate,
-      numberOfPlants,
-      description,
-      photos: photos
-        .split(",")
-        .map((photo) => photo.trim())
-        .filter((photo) => photo !== ""),
-      offeredPrice,
-    };
+    const formData = new FormData();
+
+    formData.append("location", location);
+    formData.append("startDate", startDate);
+    formData.append("endDate", endDate);
+    formData.append("numberOfPlants", numberOfPlants.toString());
+    formData.append("description", description);
+    formData.append("offeredPrice", offeredPrice.toString());
+
+    photos.forEach((photo) => {
+      formData.append("photos", photo);
+    });
 
     try {
-      await createCareRequest(careRequestData);
+      await createCareRequest(formData);
 
       toast.success("Care request created successfully");
 
@@ -43,7 +42,8 @@ function CreateCareRequest() {
       setEndDate("");
       setNumberOfPlants(0);
       setDescription("");
-      setPhotos("");
+      setPhotos([]);
+      setPhotoPreviews([]);
       setOfferedPrice(0);
 
       navigate("/care-requests");
@@ -54,6 +54,25 @@ function CreateCareRequest() {
         toast.error("Failed to create care request");
       }
     }
+  };
+
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files ?? []);
+
+    if (selectedFiles.length > 5) {
+      toast.error("You can upload a maximum of 5 images");
+      return;
+    }
+
+    photoPreviews.forEach((preview) => {
+      URL.revokeObjectURL(preview);
+    });
+
+    setPhotos(selectedFiles);
+
+    const previewUrls = selectedFiles.map((file) => URL.createObjectURL(file));
+
+    setPhotoPreviews(previewUrls);
   };
 
   return (
@@ -170,7 +189,7 @@ function CreateCareRequest() {
           />
         </div>
 
-        {/* Temporary photo URL field */}
+        {/* Photos */}
         <div>
           <label
             htmlFor="photos"
@@ -181,16 +200,29 @@ function CreateCareRequest() {
 
           <input
             id="photos"
-            type="text"
-            placeholder="Photo URLs separated by commas"
-            value={photos}
-            onChange={(event) => setPhotos(event.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handlePhotoChange}
+            className="block w-full text-sm text-gray-700"
           />
 
-          <p className="mt-1 text-xs text-gray-500">
-            We'll replace this with image uploads next.
+          <p className="mt-2 text-xs text-gray-500">
+            You can upload up to 5 images.
           </p>
+
+          {photoPreviews.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {photoPreviews.map((preview, index) => (
+                <img
+                  key={preview}
+                  src={preview}
+                  alt={`Plant preview ${index + 1}`}
+                  className="h-32 w-full rounded-xl object-cover"
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Offered price */}

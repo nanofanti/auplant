@@ -10,10 +10,11 @@ import {
 } from "../controllers/careRequestController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
+import upload from "../middleware/uploadMiddleware.js";
 
 const router = Router();
 
-router.post("/", protect, createCareRequest);
+router.post("/", protect, upload.array("photos", 5), createCareRequest);
 
 router.get("/", getCareRequests);
 

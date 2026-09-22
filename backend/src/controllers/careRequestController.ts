@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import CareRequest from "../models/CareRequest.js";
 import User from "../models/User.js";
 import type { AuthRequest } from "../middleware/authMiddleware.js";
+import cloudinary from "../config/cloudinary.js";
+import type { UploadApiResponse } from "cloudinary";
 
 export const createCareRequest = async (req: AuthRequest, res: Response) => {
   if (!req.userId) {
@@ -33,25 +35,68 @@ export const createCareRequest = async (req: AuthRequest, res: Response) => {
     endDate,
     numberOfPlants,
     description,
-    photos,
     offeredPrice,
   } = req.body;
 
-  const newCareRequest = await CareRequest.create({
-    ownerId: userId,
-    location,
-    startDate,
-    endDate,
-    numberOfPlants,
-    description,
-    photos,
-    offeredPrice,
-  });
+  const files = req.files as Express.Multer.File[];
 
-  return res.status(201).json({
-    message: "Care request created successfully",
-    data: newCareRequest,
-  });
+  try {
+    // Upload all selected images to Cloudinary
+    const uploadResults = await Promise.all(
+      files.map(
+        (file) =>
+          new Promise<UploadApiResponse>((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: "auplant/care-requests",
+              },
+              (error, result) => {
+                if (error) {
+                  console.error("Cloudinary upload error:", error);
+                  reject(error);
+                  return;
+                }
+
+                if (!result) {
+                  reject(new Error("Cloudinary upload returned no result"));
+                  return;
+                }
+
+                resolve(result);
+              },
+            );
+
+            uploadStream.end(file.buffer);
+          }),
+      ),
+    );
+
+    // Get only the URL of each uploaded image
+    const photoUrls = uploadResults.map((result) => result.secure_url);
+
+    // Create the Care Request only after all uploads succeed
+    const newCareRequest = await CareRequest.create({
+      ownerId: userId,
+      location,
+      startDate,
+      endDate,
+      numberOfPlants,
+      description,
+      photos: photoUrls,
+      offeredPrice,
+    });
+
+    return res.status(201).json({
+      message: "Care request created successfully",
+      data: newCareRequest,
+    });
+  } catch (error) {
+    console.error("Care request creation error:", error);
+
+    return res.status(500).json({
+      message: "Failed to create care request",
+    });
+  }
 };
 
 export const getCareRequests = async (req: Request, res: Response) => {

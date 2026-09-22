@@ -34,32 +34,51 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
           {careRequest.status}
         </span>
       </div>
-
-      <p>
-        <strong>Location: </strong>
-        {careRequest.location}
-      </p>
-      <div className="flex gap-6">
+      {careRequest.photos.length > 0 && (
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          {careRequest.photos.map((photo, index) => (
+            <img
+              key={photo}
+              src={photo}
+              alt={`Plant ${index + 1}`}
+              className={`h-48 w-full rounded-xl object-cover ${
+                index === 0 && careRequest.photos.length > 1 ? "col-span-2" : ""
+              }`}
+            />
+          ))}
+        </div>
+      )}
+      <div className="mt-5 space-y-2">
         <p>
-          <strong>From:</strong> {formatDate(careRequest.startDate)}
+          <strong>Location: </strong>
+          {careRequest.location}
+        </p>
+
+        <div className="flex gap-6">
+          <p>
+            <strong>From:</strong> {formatDate(careRequest.startDate)}
+          </p>
+
+          <p>
+            <strong>To:</strong> {formatDate(careRequest.endDate)}
+          </p>
+        </div>
+
+        <p>
+          <strong>Number of plants: </strong>
+          {careRequest.numberOfPlants}
         </p>
 
         <p>
-          <strong>To:</strong> {formatDate(careRequest.endDate)}
+          <strong>Description: </strong>
+          {careRequest.description}
+        </p>
+
+        <p>
+          <strong>Offered price: </strong>
+          {careRequest.offeredPrice} €
         </p>
       </div>
-      <p>
-        <strong>Number of plants: </strong>
-        {careRequest.numberOfPlants}
-      </p>
-      <p>
-        <strong>Description: </strong>
-        {careRequest.description}
-      </p>
-      <p>
-        <strong>Offered price: </strong>
-        {careRequest.offeredPrice} €
-      </p>
     </div>
   );
 }
