@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@theme {
+  --color-auplant-cream: #fdf8ec;
+  --color-auplant-sage: #cad199;
+  --color-auplant-olive: #879e3e;
+  --color-auplant-green: #446d1a;
+  --color-auplant-dark: #203b1f;
+  --color-auplant-black: #000000;
+}

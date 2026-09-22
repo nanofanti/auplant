@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-
 import { Link } from "react-router-dom";
-
 import { toast } from "sonner";
 
 import { useAuth } from "../context/AuthContext";
@@ -149,10 +147,13 @@ function Dashboard() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
+      {/* Dashboard header */}
       <header className="mb-10">
-        <p className="mb-1 text-sm font-medium text-green-700">My account</p>
+        <p className="mb-1 font-semibold uppercase tracking-wider text-auplant-olive">
+          My account
+        </p>
 
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-auplant-dark">
           Welcome back, {user?.name}
         </h1>
 
@@ -161,25 +162,29 @@ function Dashboard() {
         </p>
       </header>
 
+      {/* Profile cards */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-gray-200 bg-green-300 p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900">My Profile</h2>
+        {/* User profile */}
+        <section className="rounded-2xl border border-gray-200 bg-auplant-sage p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-auplant-dark">
+            My Profile
+          </h2>
 
-          <div className="mt-5 flex items-center gap-4">
+          <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center">
             {profileImagePreview ? (
               <img
                 src={profileImagePreview}
                 alt="Profile preview"
-                className="h-24 w-24 rounded-full object-cover"
+                className="h-24 w-24 shrink-0 rounded-full object-cover"
               />
             ) : user?.profileImage ? (
               <img
                 src={user.profileImage}
                 alt={`${user.name}'s profile`}
-                className="h-24 w-24 rounded-full object-cover"
+                className="h-24 w-24 shrink-0 rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 text-2xl font-semibold text-gray-500">
+              <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-auplant-cream text-2xl font-semibold text-auplant-dark">
                 {user?.name?.charAt(0).toUpperCase()}
               </div>
             )}
@@ -187,7 +192,7 @@ function Dashboard() {
             <div>
               <label
                 htmlFor="profileImage"
-                className="mb-2 block text-sm font-medium text-gray-700"
+                className="mb-2 block text-sm font-semibold text-auplant-green"
               >
                 Profile picture
               </label>
@@ -197,13 +202,13 @@ function Dashboard() {
                 type="file"
                 accept="image/*"
                 onChange={handleProfileImageChange}
-                className="block text-sm text-gray-700"
+                className="block max-w-full text-sm text-auplant-dark"
               />
             </div>
           </div>
 
           {profileImageFile && (
-            <div className="mt-3">
+            <div className="mt-4">
               <p className="text-sm text-gray-600">
                 Selected: {profileImageFile.name}
               </p>
@@ -211,30 +216,32 @@ function Dashboard() {
               <button
                 type="button"
                 onClick={handleProfileImageUpload}
-                className="mt-3 rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-800"
+                className="mt-3 cursor-pointer rounded-lg bg-auplant-green px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-auplant-dark"
               >
                 Upload picture
               </button>
             </div>
           )}
 
-          <div className="mt-5 space-y-3 text-gray-700">
-            <p>
-              <span className="font-medium">Name:</span> {user?.name}
+          <div className="mt-6 border-t border-auplant-olive pt-4">
+            <p className="text-auplant-text-black">
+              <span className="font-semibold text-auplant-green">Name:</span>{" "}
+              {user?.name}
             </p>
 
-            <p>
-              <span className="font-medium">Email:</span> {user?.email}
+            <p className="mt-2 text-auplant-text-black">
+              <span className="font-semibold text-auplant-green">Email:</span>{" "}
+              {user?.email}
             </p>
 
-            <div>
-              <span className="font-medium">Roles:</span>
+            <div className="mt-4">
+              <span className="font-semibold text-auplant-green">Roles</span>
 
               <div className="mt-2 flex flex-wrap gap-2">
                 {user?.roles.map((role) => (
                   <span
                     key={role}
-                    className="rounded-full bg-gray-100 px-3 py-1 text-sm capitalize text-gray-700"
+                    className="rounded-full bg-auplant-cream px-3 py-1 text-sm capitalize text-auplant-green"
                   >
                     {role}
                   </span>
@@ -244,39 +251,63 @@ function Dashboard() {
           </div>
         </section>
 
-        {sitterProfile && (
-          <section className="rounded-2xl border border-green-200 bg-green-200 p-6 shadow-sm">
-            <h2 className="mb-4 text-xl font-semibold">My Sitter Profile</h2>
+        {/* Sitter profile */}
+        {sitterProfile ? (
+          <section className="rounded-2xl border border-gray-200 bg-auplant-sage p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-xl font-semibold text-auplant-dark">
+                My Sitter Profile
+              </h2>
 
-            <p>
-              <strong>Location:</strong> {sitterProfile.location}
-            </p>
+              <span
+                className={
+                  sitterProfile.availability
+                    ? "rounded-full bg-auplant-green px-3 py-1 text-sm font-medium text-white"
+                    : "rounded-full bg-gray-200 px-3 py-1 text-sm font-medium text-gray-600"
+                }
+              >
+                {sitterProfile.availability ? "Available" : "Not available"}
+              </span>
+            </div>
 
-            <p>
-              <strong>Bio:</strong> {sitterProfile.bio}
-            </p>
+            <div className="mt-5">
+              <p className="text-sm font-semibold text-auplant-green">
+                Location
+              </p>
 
-            <p>
-              <strong>Experience:</strong> {sitterProfile.experience}
-            </p>
+              <p className="mt-1 text-auplant-text-black">
+                {sitterProfile.location}
+              </p>
+            </div>
 
-            <p>
-              <strong>Price per day:</strong> {sitterProfile.pricePerDay} €
-            </p>
+            <div className="mt-5">
+              <p className="text-sm font-semibold text-auplant-green">Bio</p>
 
-            <p>
-              <strong>Availability:</strong>{" "}
-              {sitterProfile.availability ? "Available" : "Not available"}
-            </p>
+              <p className="mt-1 text-auplant-text-black">
+                {sitterProfile.bio}
+              </p>
+            </div>
 
-            <div>
-              <strong>Services:</strong>
+            <div className="mt-5">
+              <p className="text-sm font-semibold text-auplant-green">
+                Experience
+              </p>
+
+              <p className="mt-1 text-auplant-text-black">
+                {sitterProfile.experience}
+              </p>
+            </div>
+
+            <div className="mt-5">
+              <p className="text-sm font-semibold text-auplant-green">
+                Services
+              </p>
 
               <div className="mt-2 flex flex-wrap gap-2">
                 {sitterProfile.services.map((service) => (
                   <span
                     key={service}
-                    className="rounded-full bg-gray-100 px-3 py-1 text-sm capitalize text-gray-700"
+                    className="rounded-full bg-auplant-cream px-3 py-1 text-sm text-auplant-green"
                   >
                     {service}
                   </span>
@@ -284,20 +315,49 @@ function Dashboard() {
               </div>
             </div>
 
+            <div className="mt-6 border-t border-auplant-olive pt-4">
+              <div>
+                <span className="text-2xl font-bold text-auplant-green">
+                  {sitterProfile.pricePerDay} €
+                </span>
+
+                <span className="ml-1 text-sm text-gray-600">/ day</span>
+              </div>
+
+              <Link
+                to="/sitter-profile/edit"
+                className="mt-5 inline-block rounded-lg bg-auplant-green px-4 py-2 font-semibold text-white transition-colors hover:bg-auplant-dark"
+              >
+                Edit Sitter Profile
+              </Link>
+            </div>
+          </section>
+        ) : (
+          <section className="flex flex-col justify-center rounded-2xl border border-dashed border-auplant-sage bg-auplant-cream p-6">
+            <p className="font-semibold text-auplant-dark">
+              Become a Plant Sitter
+            </p>
+
+            <p className="mt-2 text-sm text-gray-600">
+              Create a sitter profile and help other plant owners while they're
+              away.
+            </p>
+
             <Link
-              to="/sitter-profile/edit"
-              className="mt-4 inline-block rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              to="/become-sitter"
+              className="mt-5 w-fit rounded-lg bg-auplant-green px-4 py-2 font-semibold text-white transition-colors hover:bg-auplant-dark"
             >
-              Edit Sitter Profile
+              Create Sitter Profile
             </Link>
           </section>
         )}
       </div>
 
-      <section className="my-4 rounded-2xl border border-green-200 bg-green-100 p-6 shadow-sm">
-        <div className="mb-6 flex items-center justify-between gap-4">
+      {/* Care requests */}
+      <section className="mt-8 rounded-2xl border border-gray-200 bg-auplant-cream p-6 shadow-sm">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-auplant-dark">
               My Care Requests
             </h2>
 
@@ -308,15 +368,17 @@ function Dashboard() {
 
           <Link
             to="/create-care-request"
-            className="rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-800"
+            className="rounded-lg bg-auplant-green px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-auplant-dark"
           >
             + Create Request
           </Link>
         </div>
 
         {myCareRequests.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 p-8 text-center">
-            <p className="font-medium text-gray-900">No care requests yet</p>
+          <div className="rounded-2xl border border-dashed border-auplant-sage bg-white p-8 text-center">
+            <p className="font-semibold text-auplant-dark">
+              No care requests yet
+            </p>
 
             <p className="mt-1 text-sm text-gray-600">
               Create a request when you need someone to take care of your
@@ -325,7 +387,7 @@ function Dashboard() {
 
             <Link
               to="/create-care-request"
-              className="mt-4 inline-block font-medium text-green-700 hover:text-green-800"
+              className="mt-4 inline-block font-semibold text-auplant-green transition-colors hover:text-auplant-dark"
             >
               Create your first request →
             </Link>
@@ -333,32 +395,30 @@ function Dashboard() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
             {myCareRequests.map((careRequest) => (
-              <div key={careRequest._id}>
+              <div key={careRequest._id} className="rounded-2xl bg-white p-2">
                 <CareRequestCard careRequest={careRequest} />
 
-                <div>
+                <div className="px-4 pb-4">
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       type="button"
                       onClick={() =>
                         handleStatusChange(careRequest._id, careRequest.status)
                       }
-                      className={`rounded-lg px-4 py-2 text-sm font-medium ${
+                      className={
                         careRequest.status === "open"
-                          ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
-                          : "bg-green-100 text-green-800 hover:bg-green-200"
-                      }`}
+                          ? "cursor-pointer rounded-lg bg-auplant-sage px-4 py-2 text-sm font-semibold text-auplant-dark transition-colors hover:bg-auplant-olive"
+                          : "cursor-pointer rounded-lg bg-auplant-green px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-auplant-dark"
+                      }
                     >
                       {careRequest.status === "open"
                         ? "Close Request"
                         : "Reopen Request"}
                     </button>
-                  </div>
 
-                  <div className="my-2">
                     <Link
                       to={`/care-requests/${careRequest._id}/edit`}
-                      className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                      className="rounded-lg border border-auplant-green px-4 py-2 text-sm font-semibold text-auplant-green transition-colors hover:bg-auplant-sage"
                     >
                       Edit
                     </Link>
@@ -366,7 +426,7 @@ function Dashboard() {
                     <button
                       type="button"
                       onClick={() => setRequestToDelete(careRequest._id)}
-                      className="rounded-lg px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+                      className="cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50"
                     >
                       Delete
                     </button>
