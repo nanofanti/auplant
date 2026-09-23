@@ -211,19 +211,27 @@ export const uploadProfileImage = async (req: AuthRequest, res: Response) => {
 
   const oldProfileImagePublicId = user.profileImagePublicId;
 
+  let newProfileImagePublicId: string | null = null;
+
   try {
     const uploadedImage = await uploadImage(req.file, "auplant/profile-images");
+
+    // Keep track of the new image in case saving the user fails
+    newProfileImagePublicId = uploadedImage.publicId;
 
     user.profileImage = uploadedImage.url;
     user.profileImagePublicId = uploadedImage.publicId;
 
     await user.save();
 
+    // MongoDB now points to the new image,
+    // so the previous Cloudinary image can be removed
     if (oldProfileImagePublicId) {
       await Promise.allSettled([deleteImage(oldProfileImagePublicId)]);
     }
 
     const userObject = user.toObject();
+
     const { password: _, ...safeUser } = userObject;
 
     return res.status(200).json({
@@ -231,6 +239,12 @@ export const uploadProfileImage = async (req: AuthRequest, res: Response) => {
       data: safeUser,
     });
   } catch (error) {
+    // Cloudinary upload may have succeeded before MongoDB failed.
+    // Remove the new image so it doesn't become orphaned.
+    if (newProfileImagePublicId) {
+      await Promise.allSettled([deleteImage(newProfileImagePublicId)]);
+    }
+
     console.error("Profile image upload error:", error);
 
     return res.status(500).json({
