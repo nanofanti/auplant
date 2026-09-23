@@ -1,21 +1,21 @@
 import { Router } from "express";
+
 import {
-  getUserById,
-  getUsers,
   createUser,
   deleteUser,
+  getUserById,
+  getUsers,
   updateUser,
+  uploadProfileImage,
 } from "../controllers/userController.js";
+
 import { protect } from "../middleware/authMiddleware.js";
-import { uploadProfileImage } from "../controllers/userController.js";
 import upload from "../middleware/uploadMiddleware.js";
 
 const router = Router();
 
 router.get("/", getUsers);
-
 router.get("/:id", getUserById);
-
 router.post("/", createUser);
 
 router.patch(
@@ -26,7 +26,6 @@ router.patch(
 );
 
 router.patch("/:id", protect, updateUser);
-
 router.delete("/:id", protect, deleteUser);
 
 export default router;

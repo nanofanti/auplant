@@ -1,23 +1,31 @@
 import type { Request, Response } from "express";
+
 import bcrypt from "bcrypt";
-import User from "../models/User.js";
-import type { AuthRequest } from "../middleware/authMiddleware.js";
 import mongoose from "mongoose";
-import cloudinary from "../config/cloudinary.js";
-import type { UploadApiResponse } from "cloudinary";
+
+import type { AuthRequest } from "../middleware/authMiddleware.js";
+import User from "../models/User.js";
+import CareRequest from "../models/CareRequest.js";
+import SitterProfile from "../models/SitterProfile.js";
+import { deleteImage, uploadImage } from "../utils/cloudinaryUpload.js";
 
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params;
+
   const user = await User.findById(id).select("-password");
+
   if (user) {
     res.json(user);
   } else {
-    res.status(404).json({ message: "404: User not found" });
+    res.status(404).json({
+      message: "404: User not found",
+    });
   }
 };
 
 export const getUsers = async (req: Request, res: Response) => {
   const users = await User.find().select("-password");
+
   res.json(users);
 };
 
@@ -44,26 +52,72 @@ export const createUser = async (req: Request, res: Response) => {
   });
 
   const userObject = user.toObject();
+
   const { password: _, ...safeUser } = userObject;
 
-  res.status(201).json({ message: "User created", data: safeUser });
+  return res.status(201).json({
+    message: "User created",
+    data: safeUser,
+  });
 };
 
 export const deleteUser = async (req: AuthRequest, res: Response) => {
-  if (req.params.id !== req.userId) {
+  const { id } = req.params;
+
+  if (typeof id !== "string") {
+    return res.status(400).json({
+      message: "Invalid user ID",
+    });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      message: "Invalid user ID",
+    });
+  }
+
+  if (id !== req.userId) {
     return res.status(403).json({
       message: "You are not authorized to delete this account",
     });
   }
 
-  const { id } = req.params;
-  const deletedUser = await User.findByIdAndDelete(id);
+  const user = await User.findById(id);
 
-  if (!deletedUser) {
+  if (!user) {
     return res.status(404).json({
       message: "User not found",
     });
   }
+
+  const careRequests = await CareRequest.find({
+    ownerId: user._id,
+  });
+
+  const careRequestPhotoPublicIds = careRequests.flatMap((careRequest) =>
+    careRequest.photos.map((photo) => photo.publicId),
+  );
+
+  const profileImagePublicId = user.profileImagePublicId;
+
+  await SitterProfile.deleteOne({
+    userId: user._id,
+  });
+
+  await CareRequest.deleteMany({
+    ownerId: user._id,
+  });
+
+  await user.deleteOne();
+
+  const imagePublicIds = [
+    ...careRequestPhotoPublicIds,
+    ...(profileImagePublicId ? [profileImagePublicId] : []),
+  ];
+
+  await Promise.allSettled(
+    imagePublicIds.map((publicId) => deleteImage(publicId)),
+  );
 
   res.clearCookie("token");
 
@@ -76,17 +130,23 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
 
   if (typeof id !== "string") {
-    return res.status(400).json({ message: "Invalid user ID" });
+    return res.status(400).json({
+      message: "Invalid user ID",
+    });
   }
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "Invalid user ID" });
+    return res.status(400).json({
+      message: "Invalid user ID",
+    });
   }
 
   const user = await User.findById(id);
 
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({
+      message: "User not found",
+    });
   }
 
   if (user._id.toString() !== req.userId) {
@@ -141,55 +201,37 @@ export const uploadProfileImage = async (req: AuthRequest, res: Response) => {
     });
   }
 
+  const user = await User.findById(req.userId);
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  const oldProfileImagePublicId = user.profileImagePublicId;
+
   try {
-    const uploadResult = await new Promise<UploadApiResponse>(
-      (resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            folder: "auplant/profile-images",
-          },
-          (error, result) => {
-            if (error) {
-              console.error("Cloudinary upload error:", error);
-              reject(error);
-              return;
-            }
+    const uploadedImage = await uploadImage(req.file, "auplant/profile-images");
 
-            if (!result) {
-              reject(new Error("Cloudinary upload returned no result"));
-              return;
-            }
+    user.profileImage = uploadedImage.url;
+    user.profileImagePublicId = uploadedImage.publicId;
 
-            resolve(result);
-          },
-        );
+    await user.save();
 
-        uploadStream.end(req.file!.buffer);
-      },
-    );
-
-    const user = await User.findByIdAndUpdate(
-      req.userId,
-      {
-        profileImage: uploadResult.secure_url,
-      },
-      {
-        new: true,
-      },
-    ).select("-password");
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+    if (oldProfileImagePublicId) {
+      await Promise.allSettled([deleteImage(oldProfileImagePublicId)]);
     }
+
+    const userObject = user.toObject();
+    const { password: _, ...safeUser } = userObject;
 
     return res.status(200).json({
       message: "Profile image updated successfully",
-      data: user,
+      data: safeUser,
     });
   } catch (error) {
-    console.error("FULL UPLOAD ERROR:", error);
+    console.error("Profile image upload error:", error);
 
     return res.status(500).json({
       message: "Failed to upload profile image",

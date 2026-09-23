@@ -20,3 +20,16 @@ export async function uploadProfileImage(file: File) {
 
   return data;
 }
+
+export async function deleteUser(userId: string): Promise<void> {
+  const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+
+    throw new Error(errorData.message || "Failed to delete account");
+  }
+}

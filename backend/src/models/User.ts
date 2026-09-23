@@ -8,6 +8,7 @@ interface IUser {
   password: string;
   roles: UserRole[];
   profileImage?: string;
+  profileImagePublicId?: string;
   isAdmin: boolean;
 }
 
@@ -34,6 +35,9 @@ const userSchema = new mongoose.Schema<IUser>(
       default: ["owner"],
     },
     profileImage: {
+      type: String,
+    },
+    profileImagePublicId: {
       type: String,
     },
     isAdmin: {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { useAuth } from "../context/AuthContext";
@@ -12,12 +12,12 @@ import {
   getMyCareRequests,
   updateCareRequestStatus,
 } from "../services/careRequestService";
-import { uploadProfileImage } from "../services/userService";
+import { uploadProfileImage, deleteUser } from "../services/userService";
 
 import type { CareRequest, CareRequestStatus } from "../types/CareRequest";
 
 function Dashboard() {
-  const { user, sitterProfile, refreshUser } = useAuth();
+  const { user, sitterProfile, refreshUser, setUser } = useAuth();
 
   const [myCareRequests, setMyCareRequests] = useState<CareRequest[]>([]);
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
@@ -26,6 +26,12 @@ function Dashboard() {
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
     null,
   );
+
+  const navigate = useNavigate();
+
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   useEffect(() => {
     const loadMyCareRequests = async () => {
@@ -142,6 +148,32 @@ function Dashboard() {
       } else {
         toast.error("Failed to upload profile picture");
       }
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) {
+      return;
+    }
+
+    setIsDeletingAccount(true);
+
+    try {
+      await deleteUser(user._id);
+
+      setUser(null);
+
+      toast.success("Account deleted successfully");
+
+      navigate("/", { replace: true });
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to delete account");
+      }
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -437,6 +469,36 @@ function Dashboard() {
           </div>
         )}
       </section>
+
+      {/* Danger zone */}
+      <section className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6">
+        <h2 className="text-xl font-semibold text-red-700">Danger Zone</h2>
+
+        <p className="mt-2 max-w-2xl text-sm text-gray-700">
+          Permanently delete your AuPlant account, sitter profile, care requests
+          and uploaded images. This action cannot be undone.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => setShowDeleteAccountModal(true)}
+          className="mt-5 cursor-pointer rounded-lg bg-red-700 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-800"
+        >
+          Delete Account
+        </button>
+      </section>
+
+      {showDeleteAccountModal && (
+        <ConfirmModal
+          title="Delete your account?"
+          message="Your account, sitter profile, care requests and uploaded images will be permanently deleted. This action cannot be undone."
+          confirmText="Delete Account"
+          loadingText="Deleting Account..."
+          isLoading={isDeletingAccount}
+          onCancel={() => setShowDeleteAccountModal(false)}
+          onConfirm={handleDeleteAccount}
+        />
+      )}
 
       {requestToDelete && (
         <ConfirmModal
