@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+
 import logo from "../assets/AuPlantLogoNew.png";
 import { useAuth } from "../context/AuthContext";
 
@@ -67,6 +68,18 @@ function NavBar() {
             Care Requests
           </Link>
         </li>
+
+        {/* Messages */}
+        {user && (
+          <li>
+            <Link
+              className="font-medium text-auplant-dark transition-colors hover:text-auplant-green"
+              to="/messages"
+            >
+              Messages
+            </Link>
+          </li>
+        )}
 
         {/* Authentication */}
         <li>

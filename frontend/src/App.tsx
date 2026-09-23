@@ -11,10 +11,12 @@ import Dashboard from "./pages/Dashboard";
 import EditCareRequest from "./pages/EditCareRequest";
 import EditSitterProfile from "./pages/EditSitterProfile";
 import SignUp from "./pages/SignUp";
+import Conversation from "./pages/Conversation";
 import { Toaster } from "sonner";
 
 import "./App.css";
 import Instructions from "./pages/Instructions";
+import Messages from "./pages/Messages";
 
 function App() {
   return (
@@ -37,6 +39,12 @@ function App() {
             <Route
               path="/sitter-profile/edit"
               element={<EditSitterProfile />}
+            />
+            <Route path="/messages" element={<Messages />} />
+
+            <Route
+              path="/messages/:conversationId"
+              element={<Conversation />}
             />
           </Route>
           <Route path="/care-requests" element={<CareRequests />} />

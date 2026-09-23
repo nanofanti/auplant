@@ -4,6 +4,11 @@ import type { CareRequest } from "../types/CareRequest";
 
 import { formatDate } from "../utils/formatDate";
 
+import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../context/AuthContext";
+import { createOrGetConversation } from "../services/messageService";
+
 type CareRequestCardProps = {
   careRequest: CareRequest;
 };
@@ -12,6 +17,8 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null,
   );
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (selectedPhotoIndex === null) return;
@@ -67,6 +74,19 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
         ? 0
         : selectedPhotoIndex + 1,
     );
+  };
+
+  const handleContactOwner = async () => {
+    try {
+      const response = await createOrGetConversation({
+        recipientId: careRequest.ownerId._id,
+        careRequestId: careRequest._id,
+      });
+
+      navigate(`/messages/${response.data._id}`);
+    } catch (error) {
+      console.error("Failed to start conversation:", error);
+    }
   };
 
   return (
@@ -216,16 +236,18 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
           </div>
 
           {/* Contact Owner */}
-          {careRequest.status === "open" && (
-            <div className="mt-6 border-t border-auplant-olive pt-4">
-              <button
-                type="button"
-                className="w-full cursor-pointer rounded-lg bg-auplant-green px-5 py-2.5 font-semibold text-white transition-colors hover:bg-auplant-dark"
-              >
-                Contact Owner
-              </button>
-            </div>
-          )}
+          {careRequest.status === "open" &&
+            user?._id !== careRequest.ownerId._id && (
+              <div className="mt-6 border-t border-auplant-olive pt-4">
+                <button
+                  type="button"
+                  onClick={handleContactOwner}
+                  className="w-full cursor-pointer rounded-lg bg-auplant-green px-5 py-2.5 font-semibold text-white transition-colors hover:bg-auplant-dark"
+                >
+                  Contact Owner
+                </button>
+              </div>
+            )}
         </div>
       </article>
 

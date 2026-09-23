@@ -50,6 +50,8 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
     content: content.trim(),
   });
 
+  await newMessage.populate("senderId", "name profileImage");
+
   await Conversation.findByIdAndUpdate(conversationId, {
     updatedAt: new Date(),
   });

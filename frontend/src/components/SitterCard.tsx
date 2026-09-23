@@ -1,10 +1,29 @@
 import type { PlantSitter } from "../types/PlantSitter";
+import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../context/AuthContext";
+import { createOrGetConversation } from "../services/messageService";
 
 type SitterCardProps = {
   sitter: PlantSitter;
 };
 
 function SitterCard({ sitter }: SitterCardProps) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleContactSitter = async () => {
+    try {
+      const response = await createOrGetConversation({
+        recipientId: sitter.userId._id,
+      });
+
+      navigate(`/messages/${response.data._id}`);
+    } catch (error) {
+      console.error("Failed to start conversation:", error);
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-auplant-sage p-6 shadow-sm transition-shadow hover:shadow-md">
       {/* Sitter header */}
@@ -79,13 +98,16 @@ function SitterCard({ sitter }: SitterCardProps) {
           <span className="ml-1 text-sm text-gray-600">/ day</span>
         </div>
 
-        <button
-          type="button"
-          disabled={!sitter.availability}
-          className="cursor-pointer rounded-lg bg-auplant-green px-5 py-2.5 font-semibold text-white transition-colors hover:bg-auplant-dark disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
-        >
-          Contact Sitter
-        </button>
+        {user?._id !== sitter.userId._id && (
+          <button
+            type="button"
+            onClick={handleContactSitter}
+            disabled={!sitter.availability}
+            className="cursor-pointer rounded-lg bg-auplant-green px-5 py-2.5 font-semibold text-white transition-colors hover:bg-auplant-dark disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+          >
+            Contact Sitter
+          </button>
+        )}
       </div>
     </div>
   );
