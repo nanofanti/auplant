@@ -11,11 +11,11 @@ import {
   Handshake,
   Heart,
   ArrowDown,
-  ArrowUp,
 } from "lucide-react";
 
 import type { LucideIcon } from "lucide-react";
 import instructionBanner from "../assets/banners/instructions-banner.png";
+import { Link } from "react-router-dom";
 
 function Instructions() {
   const scrollToSection = (sectionId: string) => {
@@ -221,40 +221,32 @@ function Instructions() {
         </div>
       </section>
 
-      {/* Bottom CTA */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-4xl rounded-3xl bg-white p-10 text-center shadow-sm md:p-14">
-          <p className="font-semibold uppercase tracking-wider text-auplant-green">
-            Join the community
-          </p>
-
-          <h2 className="mt-2 text-3xl font-bold text-auplant-dark">
-            Ready to get started?
+      {/* Final CTA */}
+      <section className="bg-auplant-dark">
+        <div className="mx-auto max-w-6xl px-6 py-20 text-center">
+          <h2 className="text-3xl font-bold text-auplant-cream sm:text-4xl">
+            Ready to join the AuPlant community?
           </h2>
 
-          <p className="mx-auto mt-4 max-w-xl text-gray-700">
-            Find someone who will care for your plants or start helping plant
-            owners in your area.
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-auplant-sage">
+            Whether you're looking for someone to care for your plants or you'd
+            like to help other plant owners, AuPlant connects you.
           </p>
 
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => scrollToSection("find-sitter")}
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-auplant-green px-6 py-3 font-semibold text-auplant-dark transition hover:bg-auplant-sage"
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              className="rounded-lg bg-auplant-cream px-6 py-3 font-semibold text-auplant-dark transition-colors hover:bg-auplant-sage"
+              to="/find-sitter"
             >
-              Find a sitter
-              <ArrowUp size={18} />
-            </button>
+              Find a Sitter
+            </Link>
 
-            <button
-              type="button"
-              onClick={() => scrollToSection("become-sitter")}
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-auplant-green px-6 py-3 font-semibold text-white transition hover:bg-auplant-dark"
+            <Link
+              className="rounded-lg border border-auplant-sage px-6 py-3 font-semibold text-auplant-cream transition-colors hover:bg-auplant-green"
+              to="/become-sitter"
             >
-              Become a sitter
-              <ArrowUp size={18} />
-            </button>
+              Become a Sitter
+            </Link>
           </div>
         </div>
       </section>

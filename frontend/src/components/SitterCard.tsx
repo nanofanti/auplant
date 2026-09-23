@@ -69,13 +69,23 @@ function SitterCard({ sitter }: SitterCardProps) {
         </div>
       </div>
 
-      {/* Price */}
-      <div className="mt-6 border-t border-auplant-olive pt-4">
-        <span className="text-2xl font-bold text-auplant-green">
-          {sitter.pricePerDay} €
-        </span>
+      {/* Price + Contact */}
+      <div className="mt-6 flex items-center justify-between gap-4 border-t border-auplant-olive pt-4">
+        <div>
+          <span className="text-2xl font-bold text-auplant-green">
+            {sitter.pricePerDay} €
+          </span>
 
-        <span className="ml-1 text-sm text-gray-600">/ day</span>
+          <span className="ml-1 text-sm text-gray-600">/ day</span>
+        </div>
+
+        <button
+          type="button"
+          disabled={!sitter.availability}
+          className="cursor-pointer rounded-lg bg-auplant-green px-5 py-2.5 font-semibold text-white transition-colors hover:bg-auplant-dark disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+        >
+          Contact Sitter
+        </button>
       </div>
     </div>
   );

@@ -31,6 +31,12 @@ function Footer() {
           >
             Care Requests
           </Link>
+          <Link
+            to="/instructions"
+            className="text-auplant-dark transition-colors hover:text-auplant-green"
+          >
+            Instructions
+          </Link>
         </nav>
 
         {/* Copyright */}

@@ -71,25 +71,70 @@ function CareRequests() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
-      <h1 className="mb-8 text-3xl font-bold">Plant Care Requests</h1>
-      <div className="mb-8">
-        <div className="flex gap-4">
-          <div className="relative flex-1">
+      {/* Page header */}
+      <header className="mb-8">
+        <p className="mb-1 font-semibold uppercase tracking-wider text-auplant-olive">
+          Plant owners
+        </p>
+
+        <h1 className="text-3xl font-bold text-auplant-dark">
+          Plant Care Requests
+        </h1>
+
+        <p className="mt-2 max-w-2xl text-gray-600">
+          Find plant owners who are looking for someone to take care of their
+          plants while they're away.
+        </p>
+      </header>
+
+      {/* Filters */}
+      <section className="mb-8 rounded-2xl border border-gray-200 bg-auplant-cream p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="font-semibold text-auplant-dark">
+              Find a care request
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-600">
+              Filter requests by location, status, price or date.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="cursor-pointer text-sm font-semibold text-auplant-green transition-colors hover:text-auplant-dark"
+          >
+            Clear filters
+          </button>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {/* Location */}
+          <div className="relative">
+            <label
+              htmlFor="location"
+              className="mb-2 block text-sm font-semibold text-auplant-green"
+            >
+              Location
+            </label>
+
             <input
+              id="location"
               type="text"
-              placeholder="Search by location..."
+              placeholder="e.g. Heidelberg"
               value={searchTerm}
               onChange={(event) => {
                 setSearchTerm(event.target.value);
                 setShowSuggestions(true);
               }}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-auplant-green"
             />
 
             {showSuggestions &&
               searchTerm.length > 0 &&
               locationSuggestions.length > 0 && (
-                <ul className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
+                <ul className="absolute z-10 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
                   {locationSuggestions.map((location) => (
                     <li key={location}>
                       <button
@@ -98,7 +143,7 @@ function CareRequests() {
                           setSearchTerm(location);
                           setShowSuggestions(false);
                         }}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                        className="w-full cursor-pointer px-4 py-2 text-left text-sm transition-colors hover:bg-auplant-sage"
                       >
                         {location}
                       </button>
@@ -108,63 +153,139 @@ function CareRequests() {
               )}
           </div>
 
-          <select
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-            className="rounded-lg border border-gray-300 px-4 py-3"
-          >
-            <option value="all">All statuses</option>
-            <option value="open">Open</option>
-            <option value="closed">Closed</option>
-          </select>
-          <input
-            type="number"
-            min="0"
-            placeholder="Max price €"
-            value={maxPrice}
-            onChange={(event) => setMaxPrice(event.target.value)}
-            className="rounded-lg border border-gray-300 px-4 py-3"
-          />
-          <label>
-            Needed on
+          {/* Status */}
+          <div>
+            <label
+              htmlFor="status"
+              className="mb-2 block text-sm font-semibold text-auplant-green"
+            >
+              Status
+            </label>
+
+            <select
+              id="status"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-auplant-green"
+            >
+              <option value="all">All statuses</option>
+              <option value="open">Open</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+
+          {/* Price */}
+          <div>
+            <label
+              htmlFor="maxPrice"
+              className="mb-2 block text-sm font-semibold text-auplant-green"
+            >
+              Maximum price
+            </label>
+
+            <div className="relative">
+              <input
+                id="maxPrice"
+                type="number"
+                min="0"
+                placeholder="Any price"
+                value={maxPrice}
+                onChange={(event) => setMaxPrice(event.target.value)}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 pr-10 outline-none transition focus:border-auplant-green"
+              />
+
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                €
+              </span>
+            </div>
+          </div>
+
+          {/* Date */}
+          <div>
+            <label
+              htmlFor="neededOn"
+              className="mb-2 block text-sm font-semibold text-auplant-green"
+            >
+              Needed on
+            </label>
+
             <input
+              id="neededOn"
               type="date"
               value={selectedDate}
               onChange={(event) => setSelectedDate(event.target.value)}
-              className="rounded-lg border border-gray-300 px-4 py-3"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-auplant-green"
             />
-          </label>
+          </div>
+        </div>
+      </section>
+
+      {/* Results header */}
+      {!loading && !loadError && careRequests.length > 0 && (
+        <div className="mb-5 flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            <span className="font-semibold text-auplant-dark">
+              {filteredCareRequests.length}
+            </span>{" "}
+            {filteredCareRequests.length === 1
+              ? "request found"
+              : "requests found"}
+          </p>
+        </div>
+      )}
+
+      {/* Results */}
+      {loading ? (
+        <div className="rounded-2xl border border-dashed border-auplant-sage bg-auplant-cream p-10 text-center">
+          <h2 className="font-semibold text-auplant-dark">
+            Loading care requests...
+          </h2>
+
+          <p className="mt-2 text-sm text-gray-600">
+            We're looking for plant owners who need some help.
+          </p>
+        </div>
+      ) : loadError ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+          <h2 className="font-semibold text-red-700">{loadError}</h2>
+
+          <p className="mt-2 text-sm text-gray-600">Please try again later.</p>
+        </div>
+      ) : careRequests.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-auplant-sage bg-auplant-cream p-10 text-center">
+          <h2 className="text-lg font-semibold text-auplant-dark">
+            No care requests available
+          </h2>
+
+          <p className="mt-2 text-sm text-gray-600">
+            There aren't any plant care requests yet.
+          </p>
+        </div>
+      ) : filteredCareRequests.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-auplant-sage bg-auplant-cream p-10 text-center">
+          <h2 className="text-lg font-semibold text-auplant-dark">
+            No matching requests
+          </h2>
+
+          <p className="mt-2 text-sm text-gray-600">
+            Try changing or clearing some of your filters.
+          </p>
+
           <button
             type="button"
             onClick={clearFilters}
-            className="rounded-lg border border-gray-300 px-4 py-3 hover:bg-gray-100"
+            className="mt-4 cursor-pointer font-semibold text-auplant-green transition-colors hover:text-auplant-dark"
           >
             Clear all filters
           </button>
         </div>
-      </div>
-      <div className="grid gap-6 md:grid-cols-2">
-        {loading ? (
-          <h2>Loading care requests</h2>
-        ) : loadError ? (
-          <h2>{loadError}</h2>
-        ) : careRequests.length === 0 ? (
-          <div>
-            <h2>No care requests available</h2>
-          </div>
-        ) : filteredCareRequests.length === 0 ? (
-          <h2>No care requests for "{searchTerm}"</h2>
-        ) : (
-          filteredCareRequests.map((filteredCareRequest) => {
-            return (
-              <CareRequestCard
-                key={filteredCareRequest._id}
-                careRequest={filteredCareRequest}
-              />
-            );
-          })
-        )}
-      </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2">
+          {filteredCareRequests.map((careRequest) => (
+            <CareRequestCard key={careRequest._id} careRequest={careRequest} />
+          ))}
+        </div>
+      )}
     </main>
   );
 }
