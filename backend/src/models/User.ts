@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema<IUser>(
       type: [String],
       enum: ["owner", "sitter"],
       required: true,
+      default: ["owner"],
     },
     profileImage: {
       type: String,

@@ -2,7 +2,32 @@ import type {
   LoginResponse,
   GetMeResponse,
   LogoutResponse,
+  RegisterData,
+  RegisterResponse,
 } from "../types/Auth";
+
+export async function register(
+  registerData: RegisterData,
+): Promise<RegisterResponse> {
+  const response = await fetch("http://localhost:8080/api/auth/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(registerData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+
+    throw new Error(errorData.message || "Registration failed");
+  }
+
+  const data = await response.json();
+
+  return data;
+}
 
 export async function login(
   email: string,

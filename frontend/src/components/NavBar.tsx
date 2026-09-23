@@ -38,23 +38,25 @@ function NavBar() {
         </li>
 
         {/* Sitter Profile */}
-        <li className="py-4">
-          {sitterProfile ? (
-            <Link
-              className="font-medium text-auplant-dark transition-colors hover:text-auplant-green"
-              to="/dashboard"
-            >
-              My Sitter Profile
-            </Link>
-          ) : (
-            <Link
-              className="font-medium text-auplant-dark transition-colors hover:text-auplant-green"
-              to="/become-sitter"
-            >
-              Become a Sitter
-            </Link>
-          )}
-        </li>
+        {user && (
+          <li className="py-4">
+            {sitterProfile ? (
+              <Link
+                className="font-medium text-auplant-dark transition-colors hover:text-auplant-green"
+                to="/dashboard"
+              >
+                My Sitter Profile
+              </Link>
+            ) : (
+              <Link
+                className="font-medium text-auplant-dark transition-colors hover:text-auplant-green"
+                to="/become-sitter"
+              >
+                Become a Sitter
+              </Link>
+            )}
+          </li>
+        )}
 
         {/* Care Requests */}
         <li>
@@ -97,12 +99,21 @@ function NavBar() {
               </button>
             </div>
           ) : (
-            <Link
-              to="/login"
-              className="rounded-lg bg-auplant-green px-4 py-2 font-medium text-white transition-colors hover:bg-auplant-dark"
-            >
-              Login
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/login"
+                className="rounded-lg border border-auplant-green px-4 py-2 font-medium text-auplant-green transition-colors hover:bg-auplant-green hover:text-white"
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/signup"
+                className="rounded-lg bg-auplant-green px-4 py-2 font-medium text-white transition-colors hover:bg-auplant-dark"
+              >
+                Register
+              </Link>
+            </div>
           )}
         </li>
       </ul>

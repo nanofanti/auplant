@@ -19,3 +19,14 @@ export type GetMeResponse = {
 export type LogoutResponse = {
   message: string;
 };
+
+export type RegisterData = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export type RegisterResponse = {
+  message: string;
+  data: AuthUser;
+};

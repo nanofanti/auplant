@@ -4,6 +4,51 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
+//REGISTER
+export const register = async (req: Request, res: Response) => {
+  const { name, email, password } = req.body;
+
+  const existingUser = await User.findOne({
+    email,
+  });
+
+  if (existingUser) {
+    return res.status(409).json({
+      message: "An account with this email already exists",
+    });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = await User.create({
+    name,
+    email,
+    password: hashedPassword,
+  });
+
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+
+  const token = jwt.sign({ userId: newUser._id }, jwtSecret, {
+    expiresIn: "1h",
+  });
+
+  res.cookie("token", token, { httpOnly: true });
+
+  const userObject = newUser.toObject();
+
+  const { password: _, ...safeUser } = userObject;
+
+  return res.status(201).json({
+    message: "Account created successfully",
+    data: safeUser,
+  });
+};
+
+//LOGIN
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
