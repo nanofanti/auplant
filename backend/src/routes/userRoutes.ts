@@ -7,6 +7,7 @@ import {
   getUsers,
   updateUser,
   uploadProfileImage,
+  getPublicUser,
 } from "../controllers/userController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -27,5 +28,7 @@ router.patch(
 
 router.patch("/:id", protect, updateUser);
 router.delete("/:id", protect, deleteUser);
+
+router.get("/:userId/public", getPublicUser);
 
 export default router;

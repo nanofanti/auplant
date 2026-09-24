@@ -4,9 +4,9 @@ import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
 import type { AuthRequest } from "../middleware/authMiddleware.js";
-import User from "../models/User.js";
 import CareRequest from "../models/CareRequest.js";
 import SitterProfile from "../models/SitterProfile.js";
+import User from "../models/User.js";
 import { deleteImage, uploadImage } from "../utils/cloudinaryUpload.js";
 
 export const getUserById = async (req: Request, res: Response) => {
@@ -52,7 +52,6 @@ export const createUser = async (req: Request, res: Response) => {
   });
 
   const userObject = user.toObject();
-
   const { password: _, ...safeUser } = userObject;
 
   return res.status(201).json({
@@ -155,7 +154,7 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
     });
   }
 
-  const { name, email, profileImage, roles } = req.body;
+  const { name, email, profileImage, roles, bio } = req.body;
 
   if (name !== undefined) {
     user.name = name;
@@ -173,6 +172,10 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
     user.roles = roles;
   }
 
+  if (bio !== undefined) {
+    user.bio = bio;
+  }
+
   await user.save();
 
   return res.status(200).json({
@@ -183,6 +186,7 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
       email: user.email,
       roles: user.roles,
       profileImage: user.profileImage,
+      bio: user.bio,
       isAdmin: user.isAdmin,
     },
   });
@@ -231,7 +235,6 @@ export const uploadProfileImage = async (req: AuthRequest, res: Response) => {
     }
 
     const userObject = user.toObject();
-
     const { password: _, ...safeUser } = userObject;
 
     return res.status(200).json({
@@ -251,4 +254,35 @@ export const uploadProfileImage = async (req: AuthRequest, res: Response) => {
       message: "Failed to upload profile image",
     });
   }
+};
+
+export const getPublicUser = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+
+  if (typeof userId !== "string" || !mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({
+      message: "Invalid user ID",
+    });
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  const publicUser = {
+    _id: user._id,
+    name: user.name,
+    roles: user.roles,
+    profileImage: user.profileImage,
+    bio: user.bio,
+  };
+
+  return res.status(200).json({
+    message: "User found",
+    data: publicUser,
+  });
 };
