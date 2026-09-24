@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 import sitterRoutes from "./routes/sitterRoutes.js";
 import careRequestRoutes from "./routes/careRequestRoutes.js";
 import conversationRoutes from "./routes/conversationRoutes.js";
@@ -21,6 +22,8 @@ app.use("/api/sitters", sitterRoutes);
 app.use("/api/care-requests", careRequestRoutes);
 
 app.use("/api/conversations", conversationRoutes);
+
+app.use("/api/reviews", reviewRoutes);
 
 app.get("/", (req, res) => {
   res.send("AuPlant API is running 🌱!");
