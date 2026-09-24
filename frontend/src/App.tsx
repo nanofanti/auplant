@@ -19,6 +19,8 @@ import Instructions from "./pages/Instructions";
 import Messages from "./pages/Messages";
 import Disclaimer from "./pages/Disclaimer";
 import PlantCareGuide from "./pages/PlantCareGuide";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -55,6 +57,8 @@ function App() {
           <Route path="/plant-care-guide" element={<PlantCareGuide />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Route>
       </Routes>
       <Toaster />

@@ -4,6 +4,10 @@ import type {
   LogoutResponse,
   RegisterData,
   RegisterResponse,
+  ForgotPasswordData,
+  ForgotPasswordResponse,
+  ResetPasswordData,
+  ResetPasswordResponse,
 } from "../types/Auth";
 
 export async function register(
@@ -81,4 +85,51 @@ export async function logout(): Promise<LogoutResponse> {
   const data = await response.json();
 
   return data;
+}
+
+export async function forgotPassword(
+  data: ForgotPasswordData,
+): Promise<ForgotPasswordResponse> {
+  const response = await fetch(
+    "http://localhost:8080/api/auth/forgot-password",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to request password reset");
+  }
+
+  return result;
+}
+
+export async function resetPassword(
+  token: string,
+  data: ResetPasswordData,
+): Promise<ResetPasswordResponse> {
+  const response = await fetch(
+    `http://localhost:8080/api/auth/reset-password/${token}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to reset password");
+  }
+
+  return result;
 }

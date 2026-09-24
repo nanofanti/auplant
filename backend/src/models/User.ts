@@ -9,6 +9,8 @@ interface IUser {
   roles: UserRole[];
   profileImage?: string;
   profileImagePublicId?: string;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   isAdmin: boolean;
 }
 
@@ -27,6 +29,13 @@ const userSchema = new mongoose.Schema<IUser>(
     password: {
       type: String,
       required: true,
+    },
+    resetPasswordToken: {
+      type: String,
+    },
+
+    resetPasswordExpires: {
+      type: Date,
     },
     roles: {
       type: [String],

@@ -30,3 +30,20 @@ export type RegisterResponse = {
   message: string;
   data: AuthUser;
 };
+
+export type ForgotPasswordData = {
+  email: string;
+};
+
+export type ForgotPasswordResponse = {
+  message: string;
+  resetToken?: string;
+};
+
+export type ResetPasswordData = {
+  password: string;
+};
+
+export type ResetPasswordResponse = {
+  message: string;
+};
