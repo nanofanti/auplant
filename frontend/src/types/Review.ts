@@ -35,3 +35,8 @@ export interface CreateReviewResponse {
   message: string;
   data: Review;
 }
+
+export interface UpdateReviewData {
+  rating?: number;
+  comment?: string;
+}

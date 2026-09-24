@@ -5,7 +5,12 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 import { getPublicUser } from "../services/publicUserService";
-import { createReview, getReviewsForUser } from "../services/reviewService";
+import {
+  createReview,
+  getReviewsForUser,
+  updateReview,
+  deleteReview,
+} from "../services/reviewService";
 
 import type { PublicUser } from "../types/PublicUser";
 import type { ReviewsData } from "../types/Review";
@@ -68,11 +73,18 @@ const PublicUserProfile = () => {
       setIsSubmittingReview(true);
       setReviewError(null);
 
-      await createReview({
-        reviewedUserId: userId,
-        rating,
-        comment,
-      });
+      if (currentUserReview) {
+        await updateReview(currentUserReview._id, {
+          rating,
+          comment,
+        });
+      } else {
+        await createReview({
+          reviewedUserId: userId,
+          rating,
+          comment,
+        });
+      }
 
       const updatedReviews = await getReviewsForUser(userId);
 
@@ -89,6 +101,34 @@ const PublicUserProfile = () => {
       }
     } finally {
       setIsSubmittingReview(false);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    if (!currentUserReview || !userId) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your review?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteReview(currentUserReview._id);
+
+      const updatedReviews = await getReviewsForUser(userId);
+
+      setReviewsData(updatedReviews);
+    } catch (error) {
+      if (error instanceof Error) {
+        setReviewError(error.message);
+      } else {
+        setReviewError("Failed to delete review");
+      }
     }
   };
 
@@ -121,6 +161,21 @@ const PublicUserProfile = () => {
       </main>
     );
   }
+
+  const currentUserReview = reviewsData?.reviews.find(
+    (review) => review.reviewerId._id === currentUser?._id,
+  );
+
+  const handleEditReview = () => {
+    if (!currentUserReview) {
+      return;
+    }
+
+    setRating(currentUserReview.rating);
+    setComment(currentUserReview.comment ?? "");
+    setReviewError(null);
+    setShowReviewForm(true);
+  };
 
   return (
     <main className="min-h-screen bg-auplant-cream px-6 py-10">
@@ -183,7 +238,7 @@ const PublicUserProfile = () => {
         </section>
 
         {/* Write review button */}
-        {currentUser && currentUser._id !== user._id && (
+        {currentUser && currentUser._id !== user._id && !currentUserReview && (
           <button
             type="button"
             onClick={() => setShowReviewForm(true)}
@@ -193,11 +248,31 @@ const PublicUserProfile = () => {
           </button>
         )}
 
+        {currentUser && currentUser._id !== user._id && currentUserReview && (
+          <div className="mt-6 flex gap-3">
+            <button
+              type="button"
+              onClick={handleEditReview}
+              className="rounded-full bg-auplant-green px-5 py-2.5 font-medium text-white transition hover:bg-auplant-dark"
+            >
+              Edit Your Review
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDeleteReview}
+              className="rounded-full border border-red-600 px-5 py-2.5 font-medium text-red-700 transition hover:bg-red-50"
+            >
+              Delete Review
+            </button>
+          </div>
+        )}
+
         {/* Review form */}
         {showReviewForm && (
           <div className="mt-6 rounded-2xl border border-auplant-sage bg-white p-6">
             <h2 className="text-xl font-semibold text-auplant-dark">
-              Write a Review
+              {currentUserReview ? "Edit Your Review" : "Write a Review"}
             </h2>
 
             <p className="mt-4 text-sm font-medium text-gray-700">
@@ -252,7 +327,11 @@ const PublicUserProfile = () => {
                 disabled={isSubmittingReview}
                 className="rounded-full bg-auplant-green px-5 py-2.5 font-medium text-white transition hover:bg-auplant-dark disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                {isSubmittingReview
+                  ? "Saving..."
+                  : currentUserReview
+                    ? "Save Changes"
+                    : "Submit Review"}
               </button>
 
               <button
