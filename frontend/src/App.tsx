@@ -21,6 +21,7 @@ import Disclaimer from "./pages/Disclaimer";
 import PlantCareGuide from "./pages/PlantCareGuide";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import PublicUserProfile from "./pages/PublicUserProfile";
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/users/:userId" element={<PublicUserProfile />} />
         </Route>
       </Routes>
       <Toaster />
