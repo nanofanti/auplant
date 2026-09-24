@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
+
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+
 import { getConversations } from "../services/messageService";
+
 import type { Conversation } from "../types/Message";
+
+import { formatMessageDate } from "../utils/formatMessageDate";
 
 function Messages() {
   const { user } = useAuth();
@@ -16,10 +21,9 @@ function Messages() {
     const loadConversations = async () => {
       try {
         const response = await getConversations();
-
         setConversations(response.data);
       } catch (error) {
-        console.error(error);
+        console.error("Failed to load conversations:", error);
         setError("Failed to load conversations");
       } finally {
         setLoading(false);
@@ -47,14 +51,20 @@ function Messages() {
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
+      {/* Page header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-auplant-dark">Messages</h1>
+        <p className="font-semibold uppercase tracking-wider text-auplant-olive">
+          Your conversations
+        </p>
+
+        <h1 className="mt-2 text-3xl font-bold text-auplant-dark">Messages</h1>
 
         <p className="mt-2 text-gray-600">
-          Your conversations with plant owners and sitters.
+          Keep in touch with plant owners and sitters.
         </p>
       </div>
 
+      {/* Conversations */}
       {conversations.length === 0 ? (
         <div className="rounded-xl border border-auplant-sage bg-auplant-cream p-8 text-center">
           <p className="font-medium text-auplant-dark">
@@ -72,15 +82,10 @@ function Messages() {
               (participant) => participant._id !== user?._id,
             );
 
+            const latestMessage = conversation.latestMessage;
             const careRequest = conversation.careRequestId;
 
-            const lastActivity = new Date(
-              conversation.updatedAt,
-            ).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            });
+            const lastActivity = formatMessageDate(conversation.updatedAt);
 
             return (
               <Link
@@ -104,6 +109,7 @@ function Messages() {
 
                   {/* Conversation information */}
                   <div className="min-w-0 flex-1">
+                    {/* Name and last activity */}
                     <div className="flex items-start justify-between gap-4">
                       <h2 className="text-lg font-semibold text-auplant-dark">
                         {otherParticipant?.name ?? "Unknown user"}
@@ -114,8 +120,18 @@ function Messages() {
                       </span>
                     </div>
 
+                    {/* Latest message */}
+                    <p className="mt-1 truncate text-sm text-gray-500">
+                      {latestMessage
+                        ? latestMessage.senderId._id === user?._id
+                          ? `You: ${latestMessage.content}`
+                          : latestMessage.content
+                        : "No messages yet"}
+                    </p>
+
+                    {/* Care request context */}
                     {careRequest ? (
-                      <div className="mt-2">
+                      <div className="mt-3">
                         <p className="text-sm font-medium text-auplant-green">
                           Care request · {careRequest.location}
                         </p>
@@ -143,7 +159,7 @@ function Messages() {
                         </div>
                       </div>
                     ) : (
-                      <p className="mt-2 text-sm text-gray-500">
+                      <p className="mt-3 text-sm text-gray-500">
                         Direct conversation
                       </p>
                     )}

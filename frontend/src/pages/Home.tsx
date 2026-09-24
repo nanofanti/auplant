@@ -164,6 +164,104 @@ function Home() {
           </div>
         </div>
       </section>
+      {/* Plant Care Guide */}
+      <section className="bg-auplant-cream px-6 py-16">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
+          {/* Text */}
+          <div>
+            <p className="mb-2 font-semibold uppercase tracking-wider text-auplant-olive">
+              Plant Care
+            </p>
+
+            <h2 className="text-3xl font-bold text-auplant-dark">
+              Give every plant the care it deserves
+            </h2>
+
+            <p className="mt-4 max-w-xl leading-7 text-gray-600">
+              From watering and light to pruning and pest checks, discover some
+              simple guidelines that can help you take better care of plants
+              while their owner is away.
+            </p>
+
+            <Link
+              to="/plant-care-guide"
+              className="mt-6 inline-block rounded-xl bg-auplant-green px-6 py-3 font-semibold text-white transition-colors hover:bg-auplant-dark"
+            >
+              Explore the Plant Care Guide →
+            </Link>
+          </div>
+
+          {/* Care categories */}
+          <div className="rounded-2xl border border-auplant-sage bg-white p-8 shadow-sm">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <div className="rounded-xl bg-auplant-cream p-5 text-center">
+                <div className="text-3xl">💧</div>
+                <p className="mt-2 font-semibold text-auplant-dark">Watering</p>
+              </div>
+
+              <div className="rounded-xl bg-auplant-cream p-5 text-center">
+                <div className="text-3xl">☀️</div>
+                <p className="mt-2 font-semibold text-auplant-dark">Light</p>
+              </div>
+
+              <div className="rounded-xl bg-auplant-cream p-5 text-center">
+                <div className="text-3xl">🌱</div>
+                <p className="mt-2 font-semibold text-auplant-dark">Feeding</p>
+              </div>
+
+              <div className="rounded-xl bg-auplant-cream p-5 text-center">
+                <div className="text-3xl">✂️</div>
+                <p className="mt-2 font-semibold text-auplant-dark">Pruning</p>
+              </div>
+
+              <div className="rounded-xl bg-auplant-cream p-5 text-center">
+                <div className="text-3xl">💦</div>
+                <p className="mt-2 font-semibold text-auplant-dark">Humidity</p>
+              </div>
+
+              <div className="rounded-xl bg-auplant-cream p-5 text-center">
+                <div className="text-3xl">🐛</div>
+                <p className="mt-2 font-semibold text-auplant-dark">Pests</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Disclaimer */}
+      <section className="bg-white px-6 py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="rounded-2xl border border-auplant-sage p-8 sm:p-10">
+            <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+              <div className="max-w-3xl">
+                <p className="mb-2 font-semibold uppercase tracking-wider text-auplant-olive">
+                  Before you connect
+                </p>
+
+                <h2 className="text-2xl font-bold text-auplant-dark sm:text-3xl">
+                  Clear agreements make plant sitting easier
+                </h2>
+
+                <p className="mt-3 leading-7 text-gray-600">
+                  AuPlant helps owners and sitters find and contact each other.
+                  Payments and plant-sitting arrangements are agreed directly
+                  between users, so make sure expectations are clear before
+                  getting started.
+                </p>
+              </div>
+
+              <div className="shrink-0">
+                <Link
+                  to="/disclaimer"
+                  className="inline-block rounded-xl border border-auplant-green px-6 py-3 font-semibold text-auplant-green transition-colors hover:bg-auplant-green hover:text-white"
+                >
+                  Read Disclaimer →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

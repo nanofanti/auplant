@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
@@ -12,6 +12,8 @@ import type {
   Conversation as ConversationType,
 } from "../types/Message";
 
+import { toast } from "sonner";
+
 function Conversation() {
   const { user } = useAuth();
   const { conversationId } = useParams();
@@ -24,6 +26,8 @@ function Conversation() {
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const loadConversation = async () => {
@@ -52,6 +56,12 @@ function Conversation() {
     loadConversation();
   }, [conversationId]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
+
   const handleSendMessage = async (
     event: React.SubmitEvent<HTMLFormElement>,
   ) => {
@@ -71,6 +81,7 @@ function Conversation() {
       setNewMessage("");
     } catch (error) {
       console.error("Failed to send message:", error);
+      toast.error("Failed to send message. Please try again.");
     } finally {
       setSending(false);
     }
@@ -170,7 +181,7 @@ function Conversation() {
         </div>
 
         {/* Messages */}
-        <div className="min-h-96 space-y-4 bg-white px-6 py-6">
+        <div className="h-[500px] space-y-4 overflow-y-auto bg-white px-6 py-6">
           {messages.length === 0 ? (
             <div className="flex min-h-72 items-center justify-center">
               <div className="text-center">
@@ -228,6 +239,9 @@ function Conversation() {
               );
             })
           )}
+
+          {/* Invisible element used as our scroll target */}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Message form */}

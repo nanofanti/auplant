@@ -17,6 +17,8 @@ import { Toaster } from "sonner";
 import "./App.css";
 import Instructions from "./pages/Instructions";
 import Messages from "./pages/Messages";
+import Disclaimer from "./pages/Disclaimer";
+import PlantCareGuide from "./pages/PlantCareGuide";
 
 function App() {
   return (
@@ -49,6 +51,8 @@ function App() {
           </Route>
           <Route path="/care-requests" element={<CareRequests />} />
           <Route path="/instructions" element={<Instructions />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/plant-care-guide" element={<PlantCareGuide />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
         </Route>

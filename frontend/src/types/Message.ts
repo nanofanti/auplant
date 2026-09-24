@@ -16,6 +16,7 @@ export type Conversation = {
   _id: string;
   participants: ConversationParticipant[];
   careRequestId?: ConversationCareRequest;
+  latestMessage?: ChatMessage | null;
   createdAt: string;
   updatedAt: string;
 };

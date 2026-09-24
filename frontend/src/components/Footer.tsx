@@ -2,47 +2,84 @@ import { Link } from "react-router-dom";
 
 function Footer() {
   return (
-    <footer className="border-t border-auplant-sage bg-auplant-cream">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-8 sm:flex-row sm:items-center sm:justify-between">
-        {/* Brand */}
-        <Link to="/" className="text-xl font-bold text-auplant-dark">
-          AuPlant 🌱
-        </Link>
+    <footer className="bg-auplant-dark text-auplant-cream">
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
+          {/* Brand */}
+          <div>
+            <Link to="/" className="text-xl font-bold">
+              AuPlant 🌱
+            </Link>
 
-        {/* Navigation */}
-        <nav className="flex flex-wrap gap-6 text-sm">
-          <Link
-            to="/find-sitter"
-            className="text-auplant-dark transition-colors hover:text-auplant-green"
-          >
-            Find a Sitter
-          </Link>
+            <p className="mt-3 max-w-xs text-sm leading-6 text-auplant-sage">
+              Connecting plant owners with plant lovers who can care for their
+              plants while they're away.
+            </p>
+          </div>
 
-          <Link
-            to="/become-sitter"
-            className="text-auplant-dark transition-colors hover:text-auplant-green"
-          >
-            Become a Sitter
-          </Link>
+          {/* Explore */}
+          <div>
+            <h2 className="font-semibold text-white">Explore</h2>
 
-          <Link
-            to="/care-requests"
-            className="text-auplant-dark transition-colors hover:text-auplant-green"
-          >
-            Care Requests
-          </Link>
-          <Link
-            to="/instructions"
-            className="text-auplant-dark transition-colors hover:text-auplant-green"
-          >
-            Instructions
-          </Link>
-        </nav>
+            <div className="mt-4 flex flex-col items-start gap-3 text-sm text-auplant-sage">
+              <Link
+                to="/find-sitter"
+                className="transition-colors hover:text-white"
+              >
+                Find a Sitter
+              </Link>
 
-        {/* Copyright */}
-        <p className="text-sm text-gray-600">
-          © {new Date().getFullYear()} AuPlant
-        </p>
+              <Link
+                to="/care-requests"
+                className="transition-colors hover:text-white"
+              >
+                Care Requests
+              </Link>
+
+              <Link
+                to="/become-sitter"
+                className="transition-colors hover:text-white"
+              >
+                Become a Sitter
+              </Link>
+            </div>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h2 className="font-semibold text-white">Resources</h2>
+
+            <div className="mt-4 flex flex-col items-start gap-3 text-sm text-auplant-sage">
+              <Link
+                to="/instructions"
+                className="transition-colors hover:text-white"
+              >
+                How AuPlant Works
+              </Link>
+
+              <Link
+                to="/plant-care-guide"
+                className="transition-colors hover:text-white"
+              >
+                Plant Care Guide
+              </Link>
+
+              <Link
+                to="/disclaimer"
+                className="transition-colors hover:text-white"
+              >
+                Disclaimer
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom */}
+        <div className="mt-10 border-t border-auplant-green pt-6">
+          <p className="text-sm text-auplant-sage">
+            © {new Date().getFullYear()} AuPlant. All rights reserved.
+          </p>
+        </div>
       </div>
     </footer>
   );
