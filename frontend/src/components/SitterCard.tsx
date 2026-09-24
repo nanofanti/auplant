@@ -1,5 +1,5 @@
 import type { PlantSitter } from "../types/PlantSitter";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import { createOrGetConversation } from "../services/messageService";
@@ -42,9 +42,24 @@ function SitterCard({ sitter }: SitterCardProps) {
           )}
 
           <div>
-            <h2 className="text-xl font-semibold text-auplant-dark">
+            <Link
+              to={`/users/${sitter.userId._id}`}
+              className="font-semibold text-auplant-dark hover:text-auplant-green"
+            >
               {sitter.userId.name}
-            </h2>
+            </Link>
+
+            {sitter.reviewCount > 0 ? (
+              <p className="mt-1 text-sm font-medium text-auplant-green">
+                ⭐ {sitter.averageRating.toFixed(1)}{" "}
+                <span className="font-normal text-gray-500">
+                  ({sitter.reviewCount}{" "}
+                  {sitter.reviewCount === 1 ? "review" : "reviews"})
+                </span>
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-gray-500">No reviews yet</p>
+            )}
 
             <p className="text-sm text-gray-600">{sitter.location}</p>
           </div>

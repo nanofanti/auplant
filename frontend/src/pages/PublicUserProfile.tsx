@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -18,6 +18,7 @@ import type { ReviewsData } from "../types/Review";
 const PublicUserProfile = () => {
   const { userId } = useParams();
   const { user: currentUser } = useAuth();
+  const navigate = useNavigate();
 
   const [user, setUser] = useState<PublicUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -180,6 +181,13 @@ const PublicUserProfile = () => {
   return (
     <main className="min-h-screen bg-auplant-cream px-6 py-10">
       <div className="mx-auto max-w-4xl">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="mb-5 inline-flex cursor-pointer items-center gap-2 font-medium text-auplant-green transition hover:text-auplant-dark"
+        >
+          ← Go back
+        </button>
         {/* Profile header */}
         <section className="rounded-3xl bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">

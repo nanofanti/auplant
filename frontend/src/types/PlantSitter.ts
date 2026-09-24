@@ -13,6 +13,8 @@ export type PlantSitter = {
   pricePerDay: number;
   availability: boolean;
   services: string[];
+  averageRating: number;
+  reviewCount: number;
 };
 
 export type SitterProfileResponse = {

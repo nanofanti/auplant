@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import type { AuthRequest } from "../middleware/authMiddleware.js";
 import SitterProfile from "../models/SitterProfile.js";
 import User from "../models/User.js";
+import Review from "../models/Review.js";
 
 export const createSitterProfile = async (req: AuthRequest, res: Response) => {
   const { location, bio, experience, pricePerDay, availability, services } =
@@ -65,8 +66,31 @@ export const getSitterProfiles = async (req: Request, res: Response) => {
     "userId",
     "name profileImage",
   );
+
+  const sitterProfilesWithRatings = await Promise.all(
+    sitterProfiles.map(async (profile) => {
+      const reviews = await Review.find({
+        reviewedUserId: profile.userId,
+      });
+
+      const reviewCount = reviews.length;
+
+      const averageRating =
+        reviewCount > 0
+          ? reviews.reduce((sum, review) => sum + review.rating, 0) /
+            reviewCount
+          : 0;
+
+      return {
+        ...profile.toObject(),
+        averageRating,
+        reviewCount,
+      };
+    }),
+  );
+
   return res.status(200).json({
-    data: sitterProfiles,
+    data: sitterProfilesWithRatings,
   });
 };
 
