@@ -1,7 +1,9 @@
 import type { PlantSitter } from "../types/PlantSitter";
+
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+
 import { createOrGetConversation } from "../services/messageService";
 
 type SitterCardProps = {
@@ -13,6 +15,11 @@ function SitterCard({ sitter }: SitterCardProps) {
   const { user } = useAuth();
 
   const handleContactSitter = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
     try {
       const response = await createOrGetConversation({
         recipientId: sitter.userId._id,
@@ -29,22 +36,28 @@ function SitterCard({ sitter }: SitterCardProps) {
       {/* Sitter header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          {sitter.userId.profileImage ? (
-            <img
-              src={sitter.userId.profileImage}
-              alt={`${sitter.userId.name}'s profile`}
-              className="h-14 w-14 rounded-full object-cover"
-            />
-          ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-auplant-cream text-lg font-semibold text-auplant-dark">
-              {sitter.userId.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+          <Link
+            to={`/users/${sitter.userId._id}`}
+            aria-label={`View ${sitter.userId.name}'s profile`}
+            className="shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-auplant-green"
+          >
+            {sitter.userId.profileImage ? (
+              <img
+                src={sitter.userId.profileImage}
+                alt={`${sitter.userId.name}'s profile`}
+                className="h-14 w-14 rounded-full object-cover transition hover:opacity-80"
+              />
+            ) : (
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-auplant-cream text-lg font-semibold text-auplant-dark transition hover:bg-white">
+                {sitter.userId.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </Link>
 
           <div>
             <Link
               to={`/users/${sitter.userId._id}`}
-              className="font-semibold text-auplant-dark hover:text-auplant-green"
+              className="font-semibold text-auplant-dark transition hover:text-auplant-green hover:underline"
             >
               {sitter.userId.name}
             </Link>
@@ -78,13 +91,13 @@ function SitterCard({ sitter }: SitterCardProps) {
       </div>
 
       {/* Bio */}
-      <p className="mt-5 text-auplant-text-black">{sitter.bio}</p>
+      <p className="mt-5 text-auplant-dark">{sitter.bio}</p>
 
       {/* Experience */}
       <div className="mt-5">
         <p className="text-sm font-semibold text-auplant-green">Experience</p>
 
-        <p className="mt-1 text-auplant-text-black">{sitter.experience}</p>
+        <p className="mt-1 text-auplant-dark">{sitter.experience}</p>
       </div>
 
       {/* Services */}
@@ -113,14 +126,14 @@ function SitterCard({ sitter }: SitterCardProps) {
           <span className="ml-1 text-sm text-gray-600">/ day</span>
         </div>
 
-        {user?._id !== sitter.userId._id && (
+        {(!user || user._id !== sitter.userId._id) && (
           <button
             type="button"
             onClick={handleContactSitter}
             disabled={!sitter.availability}
             className="cursor-pointer rounded-lg bg-auplant-green px-5 py-2.5 font-semibold text-white transition-colors hover:bg-auplant-dark disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
           >
-            Contact Sitter
+            {user ? "Contact Sitter" : "Log in to Contact"}
           </button>
         )}
       </div>

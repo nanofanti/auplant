@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -368,22 +368,31 @@ const PublicUserProfile = () => {
                   className="rounded-2xl bg-white p-6 shadow-sm"
                 >
                   <div className="flex items-center gap-4">
-                    {review.reviewerId.profileImage ? (
-                      <img
-                        src={review.reviewerId.profileImage}
-                        alt={`${review.reviewerId.name}'s profile`}
-                        className="h-12 w-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-auplant-sage font-bold text-auplant-dark">
-                        {review.reviewerId.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+                    <Link
+                      to={`/users/${review.reviewerId._id}`}
+                      aria-label={`View ${review.reviewerId.name}'s profile`}
+                      className="shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-auplant-green"
+                    >
+                      {review.reviewerId.profileImage ? (
+                        <img
+                          src={review.reviewerId.profileImage}
+                          alt={`${review.reviewerId.name}'s profile`}
+                          className="h-12 w-12 rounded-full object-cover transition hover:opacity-80"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-auplant-sage font-bold text-auplant-dark transition hover:bg-auplant-olive">
+                          {review.reviewerId.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </Link>
 
                     <div>
-                      <h3 className="font-semibold text-auplant-dark">
+                      <Link
+                        to={`/users/${review.reviewerId._id}`}
+                        className="font-semibold text-auplant-dark transition hover:text-auplant-green hover:underline"
+                      >
                         {review.reviewerId.name}
-                      </h3>
+                      </Link>
 
                       <p className="text-sm text-auplant-green">
                         ⭐ {review.rating}/5

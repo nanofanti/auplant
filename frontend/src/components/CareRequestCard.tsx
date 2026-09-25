@@ -4,7 +4,7 @@ import type { CareRequest } from "../types/CareRequest";
 
 import { formatDate } from "../utils/formatDate";
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import { createOrGetConversation } from "../services/messageService";
@@ -77,6 +77,11 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
   };
 
   const handleContactOwner = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
     try {
       const response = await createOrGetConversation({
         recipientId: careRequest.ownerId._id,
@@ -101,26 +106,35 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
         {/* Owner */}
         <div className="flex items-center justify-between gap-4 p-5">
           <div className="flex min-w-0 items-center gap-3">
-            {careRequest.ownerId.profileImage ? (
-              <img
-                src={careRequest.ownerId.profileImage}
-                alt={`${careRequest.ownerId.name}'s profile`}
-                className="h-11 w-11 shrink-0 rounded-full object-cover"
-              />
-            ) : (
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-auplant-olive font-semibold text-auplant-dark">
-                {careRequest.ownerId.name.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <Link
+              to={`/users/${careRequest.ownerId._id}`}
+              aria-label={`View ${careRequest.ownerId.name}'s profile`}
+              className="shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-auplant-green"
+            >
+              {careRequest.ownerId.profileImage ? (
+                <img
+                  src={careRequest.ownerId.profileImage}
+                  alt={`${careRequest.ownerId.name}'s profile`}
+                  className="h-11 w-11 rounded-full object-cover transition hover:opacity-80"
+                />
+              ) : (
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-auplant-olive font-semibold text-auplant-dark transition hover:bg-auplant-cream">
+                  {careRequest.ownerId.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </Link>
 
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-wider text-auplant-olive">
                 Plant owner
               </p>
 
-              <h2 className="truncate text-lg font-semibold text-auplant-dark">
+              <Link
+                to={`/users/${careRequest.ownerId._id}`}
+                className="block truncate text-lg font-semibold text-auplant-dark transition hover:text-auplant-green hover:underline"
+              >
                 {careRequest.ownerId.name}
-              </h2>
+              </Link>
             </div>
           </div>
 
@@ -237,14 +251,14 @@ function CareRequestCard({ careRequest }: CareRequestCardProps) {
 
           {/* Contact Owner */}
           {careRequest.status === "open" &&
-            user?._id !== careRequest.ownerId._id && (
+            (!user || user._id !== careRequest.ownerId._id) && (
               <div className="mt-6 border-t border-auplant-olive pt-4">
                 <button
                   type="button"
                   onClick={handleContactOwner}
                   className="w-full cursor-pointer rounded-lg bg-auplant-green px-5 py-2.5 font-semibold text-white transition-colors hover:bg-auplant-dark"
                 >
-                  Contact Owner
+                  {user ? "Contact Owner" : "Log in to Contact"}
                 </button>
               </div>
             )}
