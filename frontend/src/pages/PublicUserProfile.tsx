@@ -14,6 +14,8 @@ import {
 
 import type { PublicUser } from "../types/PublicUser";
 import type { ReviewsData } from "../types/Review";
+import PageHero from "../components/PageHero";
+import instructionBanner from "../assets/banners/instructions-banner.png";
 
 const PublicUserProfile = () => {
   const { userId } = useParams();
@@ -179,8 +181,14 @@ const PublicUserProfile = () => {
   };
 
   return (
-    <main className="min-h-screen bg-auplant-cream px-6 py-10">
-      <div className="mx-auto max-w-4xl">
+    <main className="bg-auplant-cream">
+      <PageHero
+        image={instructionBanner}
+        eyebrow="User"
+        title={`Find more about ${user.name}`}
+        description="Info & reviews"
+      />
+      <div className="mx-auto max-w-6xl py-16">
         <button
           type="button"
           onClick={() => navigate(-1)}

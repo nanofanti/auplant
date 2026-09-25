@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 
 import SitterCard from "../components/SitterCard";
+import PageHero from "../components/PageHero";
 
 import { getSitters } from "../services/sitterService";
 
 import type { PlantSitter } from "../types/PlantSitter";
+
+import instructionBanner from "../assets/banners/instructions-banner.png";
 
 function FindSitter() {
   const [sitters, setSitters] = useState<PlantSitter[]>([]);
@@ -48,31 +51,30 @@ function FindSitter() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Find a Plant Sitter
-        </h1>
+    <main className="bg-auplant-cream">
+      <PageHero
+        image={instructionBanner}
+        eyebrow="The search begins now"
+        title="Find a Plant Sitter"
+        description="Find someone nearby to take care of your plants while you're away."
+      />
 
-        <p className="mt-2 text-gray-600">
-          Find someone nearby to take care of your plants while you're away.
-        </p>
+      <div className="mx-auto max-w-6xl py-16">
+        {sitters.length === 0 ? (
+          <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
+            <p className="text-gray-600">
+              No plant sitters are available at the moment.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {sitters.map((sitter) => (
+              <SitterCard key={sitter._id} sitter={sitter} />
+            ))}
+          </div>
+        )}
       </div>
-
-      {sitters.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-          <p className="text-gray-600">
-            No plant sitters are available at the moment.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {sitters.map((sitter) => (
-            <SitterCard key={sitter._id} sitter={sitter} />
-          ))}
-        </div>
-      )}
-    </div>
+    </main>
   );
 }
 

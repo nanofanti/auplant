@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { createCareRequest } from "../services/careRequestService";
+import instructionBanner from "../assets/banners/instructions-banner.png";
+import PageHero from "../components/PageHero";
 
 function CreateCareRequest() {
   const [location, setLocation] = useState<string>("");
@@ -119,184 +121,187 @@ function CreateCareRequest() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-10">
-      <h1 className="text-3xl font-bold text-gray-900">
-        Looking for a Plant Sitter
-      </h1>
-
-      <p className="mt-2 text-gray-600">
-        Create a request and let local plant sitters know what your plants need.
-      </p>
-
-      <form
-        className="mt-8 space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
-        onSubmit={handleSubmit}
-      >
-        {/* Location */}
-        <div>
-          <label
-            htmlFor="location"
-            className="mb-2 block text-sm font-medium text-gray-700"
-          >
-            Location
-          </label>
-
-          <input
-            id="location"
-            type="text"
-            placeholder="e.g. Heidelberg"
-            value={location}
-            onChange={(event) => setLocation(event.target.value)}
-            required
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
-          />
-        </div>
-
-        {/* Dates */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label
-              htmlFor="startDate"
-              className="mb-2 block text-sm font-medium text-gray-700"
-            >
-              Start date
-            </label>
-
-            <input
-              id="startDate"
-              type="date"
-              value={startDate}
-              onChange={(event) => setStartDate(event.target.value)}
-              required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="endDate"
-              className="mb-2 block text-sm font-medium text-gray-700"
-            >
-              End date
-            </label>
-
-            <input
-              id="endDate"
-              type="date"
-              value={endDate}
-              onChange={(event) => setEndDate(event.target.value)}
-              required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
-            />
-          </div>
-        </div>
-
-        {/* Number of plants */}
-        <div>
-          <label
-            htmlFor="numberOfPlants"
-            className="mb-2 block text-sm font-medium text-gray-700"
-          >
-            Number of plants
-          </label>
-
-          <input
-            id="numberOfPlants"
-            type="number"
-            min="1"
-            placeholder="e.g. 5"
-            value={numberOfPlants}
-            onChange={(event) => setNumberOfPlants(Number(event.target.value))}
-            required
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
-          />
-        </div>
-
-        {/* Description */}
-        <div>
-          <label
-            htmlFor="description"
-            className="mb-2 block text-sm font-medium text-gray-700"
-          >
-            Care instructions
-          </label>
-
-          <textarea
-            id="description"
-            rows={5}
-            placeholder="Describe your plants and what the sitter should know..."
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            required
-            className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
-          />
-        </div>
-
-        {/* Photos */}
-        <div>
-          <label
-            htmlFor="photos"
-            className="mb-2 block text-sm font-medium text-gray-700"
-          >
-            Photos
-          </label>
-
-          <input
-            id="photos"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handlePhotoChange}
-            className="block w-full text-sm text-gray-700"
-          />
-
-          <p className="mt-2 text-xs text-gray-500">
-            Maximum 5 photos. Maximum 5 MB per image.
-          </p>
-
-          {photoPreviews.length > 0 && (
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {photoPreviews.map((preview, index) => (
-                <img
-                  key={preview}
-                  src={preview}
-                  alt={`Plant preview ${index + 1}`}
-                  className="h-32 w-full rounded-xl object-cover"
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Offered price */}
-        <div>
-          <label
-            htmlFor="offeredPrice"
-            className="mb-2 block text-sm font-medium text-gray-700"
-          >
-            Offered price (€)
-          </label>
-
-          <input
-            id="offeredPrice"
-            type="number"
-            min="0"
-            placeholder="e.g. 40"
-            value={offeredPrice}
-            onChange={(event) => setOfferedPrice(Number(event.target.value))}
-            required
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="w-full cursor-pointer rounded-lg bg-green-700 px-4 py-3 font-semibold text-white transition-colors hover:bg-green-800"
+    <main className="bg-auplant-cream">
+      <PageHero
+        image={instructionBanner}
+        eyebrow="Create care request"
+        title="Looking for a Plant Sitter"
+        description="Create a request and let local plant sitters know what your plants
+          need."
+      />
+      <div className="mx-auto max-w-2xl px-6 py-10">
+        <form
+          className="mt-8 space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+          onSubmit={handleSubmit}
         >
-          Create Care Request
-        </button>
-      </form>
-    </div>
+          {/* Location */}
+          <div>
+            <label
+              htmlFor="location"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
+              Location
+            </label>
+
+            <input
+              id="location"
+              type="text"
+              placeholder="e.g. Heidelberg"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              required
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
+            />
+          </div>
+
+          {/* Dates */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="startDate"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                Start date
+              </label>
+
+              <input
+                id="startDate"
+                type="date"
+                value={startDate}
+                onChange={(event) => setStartDate(event.target.value)}
+                required
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="endDate"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                End date
+              </label>
+
+              <input
+                id="endDate"
+                type="date"
+                value={endDate}
+                onChange={(event) => setEndDate(event.target.value)}
+                required
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
+              />
+            </div>
+          </div>
+
+          {/* Number of plants */}
+          <div>
+            <label
+              htmlFor="numberOfPlants"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
+              Number of plants
+            </label>
+
+            <input
+              id="numberOfPlants"
+              type="number"
+              min="1"
+              placeholder="e.g. 5"
+              value={numberOfPlants}
+              onChange={(event) =>
+                setNumberOfPlants(Number(event.target.value))
+              }
+              required
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label
+              htmlFor="description"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
+              Care instructions
+            </label>
+
+            <textarea
+              id="description"
+              rows={5}
+              placeholder="Describe your plants and what the sitter should know..."
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              required
+              className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
+            />
+          </div>
+
+          {/* Photos */}
+          <div>
+            <label
+              htmlFor="photos"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
+              Photos
+            </label>
+
+            <input
+              id="photos"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handlePhotoChange}
+              className="block w-full text-sm text-gray-700"
+            />
+
+            <p className="mt-2 text-xs text-gray-500">
+              Maximum 5 photos. Maximum 5 MB per image.
+            </p>
+
+            {photoPreviews.length > 0 && (
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {photoPreviews.map((preview, index) => (
+                  <img
+                    key={preview}
+                    src={preview}
+                    alt={`Plant preview ${index + 1}`}
+                    className="h-32 w-full rounded-xl object-cover"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Offered price */}
+          <div>
+            <label
+              htmlFor="offeredPrice"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
+              Offered price (€)
+            </label>
+
+            <input
+              id="offeredPrice"
+              type="number"
+              min="0"
+              placeholder="e.g. 40"
+              value={offeredPrice}
+              onChange={(event) => setOfferedPrice(Number(event.target.value))}
+              required
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-green-600"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full cursor-pointer rounded-lg bg-green-700 px-4 py-3 font-semibold text-white transition-colors hover:bg-green-800"
+          >
+            Create Care Request
+          </button>
+        </form>
+      </div>
+    </main>
   );
 }
 

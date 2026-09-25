@@ -10,86 +10,24 @@ import {
   MapPin,
   Handshake,
   Heart,
-  ArrowDown,
 } from "lucide-react";
 
 import type { LucideIcon } from "lucide-react";
 import instructionBanner from "../assets/banners/instructions-banner.png";
 import { Link } from "react-router-dom";
+import PageHero from "../components/PageHero";
+import PageBanner from "../components/PageBanner";
 
 function Instructions() {
-  const scrollToSection = (sectionId: string) => {
-    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <main className="bg-auplant-cream">
-      {/* Header */}
-      <section className="px-6 py-16 text-center">
-        <div className="mx-auto max-w-4xl">
-          <p className="mb-2 font-semibold uppercase tracking-wider text-auplant-green">
-            Getting started
-          </p>
-
-          <h1 className="text-4xl font-bold text-auplant-dark md:text-5xl">
-            How AuPlant Works
-          </h1>
-
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-700">
-            Whether you're looking for someone to take care of your plants or
-            you'd like to help other plant owners, getting started is simple.
-          </p>
-        </div>
-      </section>
-
-      {/* Banner */}
-      <section
-        className="relative flex min-h-[600px] items-center bg-cover bg-center px-6 py-16"
-        style={{
-          backgroundImage: `url(${instructionBanner})`,
-        }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/30" />
-
-        <div className="relative z-10 mx-auto w-full max-w-6xl">
-          <div className="max-w-xl rounded-3xl bg-auplant-cream/90 p-8 backdrop-blur-sm md:p-10">
-            <p className="font-semibold uppercase tracking-wider text-auplant-green">
-              Plants bring people together
-            </p>
-
-            <h2 className="mt-3 text-3xl font-bold text-auplant-dark md:text-4xl">
-              Find the right way to use AuPlant
-            </h2>
-
-            <p className="mt-4 leading-relaxed text-gray-700">
-              Whether your plants need someone while you're away or you'd like
-              to help other plant lovers, AuPlant connects people who care.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => scrollToSection("find-sitter")}
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-auplant-green bg-white px-6 py-3 font-semibold text-auplant-dark transition hover:bg-auplant-sage"
-              >
-                Find a sitter
-                <ArrowDown size={18} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => scrollToSection("become-sitter")}
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-auplant-green px-6 py-3 font-semibold text-white transition hover:bg-auplant-dark"
-              >
-                Become a sitter
-                <ArrowDown size={18} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <PageHero
+        image={instructionBanner}
+        eyebrow="How AuPlant Works"
+        title="Getting started"
+        description="Whether you're looking for someone to take care of your plants or
+            you'd like to help other plant owners, getting started is simple."
+      />
       {/* Plant owner */}
       <section id="find-sitter" className="scroll-mt-20 px-6 py-20">
         <div className="mx-auto max-w-6xl">
@@ -250,6 +188,12 @@ function Instructions() {
           </div>
         </div>
       </section>
+      <PageBanner
+        image={instructionBanner}
+        eyebrow="Lorem Ipsum"
+        title="Lorem Ipsum"
+        description="Find someone nearby to take care of your plants while you're away."
+      />
     </main>
   );
 }

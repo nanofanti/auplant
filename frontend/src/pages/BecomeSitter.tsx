@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
 import { createSitter } from "../services/sitterService";
 import type { CreateSitterData } from "../types/PlantSitter";
+import instructionBanner from "../assets/banners/instructions-banner.png";
+import PageHero from "../components/PageHero";
 
 const availableServices = [
   { value: "watering", label: "Watering" },
@@ -79,24 +81,15 @@ function BecomeSitter() {
   };
 
   return (
-    <div className="bg-auplant-cream px-6 py-12">
-      <div className="mx-auto max-w-3xl">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-auplant-green">
-            Join the AuPlant community
-          </p>
-
-          <h1 className="text-3xl font-bold text-auplant-dark sm:text-4xl">
-            Become a Plant Sitter
-          </h1>
-
-          <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-            Create your sitter profile and help plant owners take care of their
-            plants while they're away.
-          </p>
-        </div>
-
+    <main className="bg-auplant-cream">
+      <PageHero
+        image={instructionBanner}
+        eyebrow="Join the AuPlant community"
+        title="Become a Plant Sitter"
+        description="Create your sitter profile and help plant owners take care of their
+            plants while they're away."
+      />
+      <div className="mx-auto max-w-3xl py-16">
         {/* Form card */}
         <form
           onSubmit={handleSubmit}
@@ -270,7 +263,7 @@ function BecomeSitter() {
           </div>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
 

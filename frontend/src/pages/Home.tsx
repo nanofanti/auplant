@@ -4,6 +4,8 @@ import connectImage from "../assets/how-it-works/connect-sitter.png";
 import relaxImage from "../assets/how-it-works/relax-plants.png";
 import HowItWorksCard from "../components/HowItWorksCard";
 import heroImage from "../assets/hero/hero-plant-sitter.png";
+import instructionBanner from "../assets/banners/instructions-banner.png";
+import PageBanner from "../components/PageBanner";
 
 const howItWorks = [
   {
@@ -28,12 +30,12 @@ const howItWorks = [
 
 function Home() {
   return (
-    <main>
+    <main className="bg-auplant-cream">
       {/* Hero */}
       <section className="overflow-hidden bg-auplant-cream">
-        <div className="mx-auto grid max-w-[1600px] items-center gap-10 px-6 py-20 lg:grid-cols-2 lg:px-10 lg:py-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 lg:grid-cols-2">
           {/* Hero text */}
-          <div className="max-w-3xl">
+          <div>
             <p className="mb-4 font-semibold uppercase tracking-wider text-auplant-olive">
               Plant care made simple
             </p>
@@ -74,11 +76,9 @@ function Home() {
           </div>
         </div>
       </section>
-
       {/* How it works */}
-      <section className="bg-white py-20">
-        {/* Text stays aligned with the rest of the site */}
-        <div className="mx-auto max-w-6xl px-6">
+      <section className="bg-white px-6 py-20 lg:px-10">
+        <div className="mx-auto max-w-4xl text-center">
           <p className="font-semibold uppercase tracking-wider text-auplant-olive">
             Simple & easy
           </p>
@@ -87,15 +87,13 @@ function Home() {
             How It Works
           </h2>
 
-          <p className="mt-3 max-w-2xl text-gray-600">
+          <p className="mt-3  text-gray-600 text-center">
             Finding someone you trust to care for your plants only takes a few
             steps.
           </p>
         </div>
-
-        {/* Cards use almost the entire screen */}
-        <div className="mx-auto mt-10 w-full max-w-[1600px] px-6 lg:px-10">
-          <div className="grid gap-6 md:grid-cols-3">
+        <div className="w-full">
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
             {howItWorks.map((homeCard) => (
               <HowItWorksCard
                 key={homeCard.listNumber}
@@ -262,6 +260,12 @@ function Home() {
           </div>
         </div>
       </section>
+      <PageBanner
+        image={instructionBanner}
+        eyebrow="Lorem Ipsum"
+        title="Lorem Ipsum"
+        description="Find someone nearby to take care of your plants while you're away."
+      />
     </main>
   );
 }
